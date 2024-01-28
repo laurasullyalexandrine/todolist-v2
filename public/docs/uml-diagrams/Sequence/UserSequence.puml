@@ -1,0 +1,14 @@
+@startuml UserSequence
+
+skinparam responseCommentBelowArrow true
+skinparam SequenceCommentAlignment center
+
+actor User as User #Plum
+
+entity Task as Task #LightYellow
+
+database ToDoList as ToDoList #HotPink
+
+
+end
+@enduml

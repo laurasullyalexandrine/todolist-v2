@@ -1,0 +1,15 @@
+@startuml User
+
+Class User {
+    
+    - username : string
+    - email : string
+    - password: string
+    - roles: array 
+    
+    + login()
+    + logout()
+
+}
+
+@enduml
