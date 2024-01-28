@@ -1,0 +1,11 @@
+@startuml Task
+
+Class Task {
+    
+    - title : string
+    - content : string
+    - isDone: bool
+    
+}
+
+@enduml
