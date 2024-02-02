@@ -2,36 +2,22 @@
 
 left to right direction
 
-actor "User" as User #Plum
+actor "User" as user #YellowGreen
 
-rectangle SnowTricks{
-  usecase "S'inscrire" as UC1
+rectangle ToDoList {
+
+  usecase "Créer un compte" as UC1
   usecase "Se connecter" as UC2
-  usecase "Valider son email" as UC3
-  usecase "Consulter les Tricks" as UC4
-  usecase "Consulter une Trick" as UC5
-  usecase "Ajouter une Trick" as UC6
-  usecase "Modifier sa Trick" as UC7
-  usecase "Supprimer sa Trick" as UC8
-  usecase "Ajouter ses commentaires" as UC9
-  usecase "Modifier ses commentaires" as UC10
-  usecase "Supprimer ses commentaires" as UC11
-  usecase "Réinitialiser son mot de passe" as UC12
-  usecase "Consutler d'autre ressource du site" as UC13
+  usecase "Créer ses tâches" as UC3
+  usecase "Modifier ses tâches" as UC4
+  usecase "Supprimer ses tâches" as UC5
+
 }
 
-User --> UC1
-User --> UC2
-User --> UC3
-User --> UC4
-User --> UC5
-User --> UC6
-User --> UC7
-User --> UC8
-User --> UC9
-User --> UC10
-User --> UC11
-User --> UC12
-User --> UC13
+user --> UC1
+user --> UC2
+user --> UC3
+user --> UC4
+user --> UC5
 
 @enduml

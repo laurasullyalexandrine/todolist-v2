@@ -1,15 +1,33 @@
-@startuml AdminSequence
+@startuml Admin
 
-skinparam responseCommentBelowArrow true
-skinparam SequenceCommentAlignment center
+left to right direction
 
-actor Admin as Admin #Plum
+actor "Admin" as admin #OliveDrab
 
-entity User as User #LightYellow
-entity Task as Task #LightYellow
+rectangle ToDoList {
 
-database ToDoList as ToDoList #HotPink
+  usecase "Créer un compte" as UC1
+  usecase "Se connecter" as UC2
+  usecase "Créer des utilisateurs" as UC3
+  usecase "Modifier des utilisateurs" as UC4
+  usecase "Supprimer des utilisateurs" as UC5
+  usecase "Créer ses tâches" as UC6
+  usecase "Modifier ses tâches" as UC7
+  usecase "Supprimer ses tâches" as UC8
+  usecase "Modifier les tâches anonymes" as UC9
+  usecase "Supprimer les tâches anonymes" as UC10
+  
+}
 
+admin --> UC1
+admin --> UC2
+admin --> UC3
+admin --> UC4
+admin --> UC5
+admin --> UC6
+admin --> UC7
+admin --> UC8
+admin --> UC9
+admin --> UC10
 
-end
 @enduml
