@@ -1,0 +1,20 @@
+{# display every flash message available #}
+<div class="row">
+	<div class="col-md-12">
+		{% for label, messages in app.flashes %}
+			{% for message in messages %}
+				<div class="alert alert-{{ label }}">
+                {% if label == "danger" %}
+                    <strong>Oops !</strong>
+                {% else %}
+                    <strong>Superbe !</strong>
+                {% endif %}
+					{{ message }}
+				</div>
+			{% endfor %}
+		{% endfor %}
+
+         {% block header_title %}{% endblock %}
+                    {% block header_img %}<img class="slide-image" src="{{ asset('img/todolist_homepage.jpg') }}" alt="todo list">{% endblock %}
+	</div>
+</div>
