@@ -1,13 +1,33 @@
-@startuml UserSequence
+@startuml AdminSequence
 
-skinparam responseCommentBelowArrow true
-skinparam SequenceCommentAlignment center
+skinparam responseMessageBelowArrow true
+skinparam SequenceMessageAlignment center
 
-actor User as User #Plum
+actor User as User #YellowGreen
 
-entity Task as Task #LightYellow
+entity Task as Task #GreenYellow
 
-database ToDoList as ToDoList #HotPink
+database ToDoList as ToDoList #Orange
+
+User  -> ToDoList: demander authentification 
+ToDoList-> User: valider authentification 
+else 401 (Unauthorized) identification invalides
+ToDoList-> User: échec de l'authentification
+
+User  -> Task: ajouter une tâche
+Task -> User: valider ajout
+else erreur durant le traitement
+Task -> User: la tâche n'a pas pu être ajoutée
+
+User  -> Task: éditer tâche
+Task -> User: valider édition
+else 404 (Page not found)
+Task -> User: la tâche en cours de modification n'existe pas
+
+User  -> Task: supprimer tâche
+Task -> User: valider suppression
+else 403 (Forbidden)
+Task -> User: Vous n'avez pas accès à cette ressource
 
 
 end
