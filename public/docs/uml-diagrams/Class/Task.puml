@@ -1,5 +1,9 @@
 @startuml Task
 
+!include User.puml
+!include TaskManager.puml
+!include UserManager.puml
+
 Class Task {
     
     - title : string
@@ -7,5 +11,9 @@ Class Task {
     - isDone: bool
     
 }
+
+Task *-"1" User: create <
+TaskManager -- Task: exec 
+UserManager -- User: exec
 
 @enduml

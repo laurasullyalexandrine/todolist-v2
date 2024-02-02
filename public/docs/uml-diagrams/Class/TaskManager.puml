@@ -1,0 +1,12 @@
+@startuml TaskManager
+
+Class TaskManager {
+
+    + addTask(Task post, User user)
+    + updateTask(Task post, User user)
+    + deleteTask(Task post, User user)
+    + createListingTask(Task post)
+    
+}
+
+@enduml
