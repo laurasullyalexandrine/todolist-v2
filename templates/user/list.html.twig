@@ -1,11 +1,10 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Liste utilisateurs{% endblock %}
+{% block header_img %}{% endblock %}
 
 {% block body %}
     {% if users|length == 0 %}
         <div class="alert alert-warning">
-        test
             {# Il n'y a pas encore d'utilisateur enregistré. <a href="{{ path('user_create') }}" class="btn btn-warning pull-right">Créer un utilisateur</a> #}
         </div>
     {% else %}

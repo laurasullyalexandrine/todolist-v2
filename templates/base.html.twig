@@ -5,7 +5,9 @@
 
 	<div class="container">
 		<div class="row">
-			<div class="col-md-12"> 
+			<div class="col-md-12">
+				{% block header_title %}{% endblock %}
+				{% block header_img %}<img class="slide-image" src="{{ asset('img/todolist_homepage.jpg') }}" alt="todo list">{% endblock %}
                 {% block body %}{% endblock %}
 			</div>
 		</div>
