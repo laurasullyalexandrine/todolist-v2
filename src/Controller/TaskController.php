@@ -22,7 +22,7 @@ class TaskController extends AbstractController
         ]);
     }
 
-    #[Route('/', name: 'create')]
+    #[Route('/create', name: 'create', methods: ["GET", "POST"])]
     public function create(Request $request, EntityManagerInterface $manager): Response
     {
         $task = new Task();
@@ -38,8 +38,32 @@ class TaskController extends AbstractController
 
             return $this->redirectToRoute('task_list');
         }
+
         return $this->render('task/create.html.twig', [
             'form' => $form->createView(),
+        ]);
+    }
+
+
+    #[Route('/{id}/edit', name: 'edit', methods: ["GET", "POST"])]
+    public function edit(Task $task, Request $request, EntityManagerInterface $manager): Response
+    {
+        $form = $this->createForm(TaskType::class, $task);
+
+        $form->handleRequest($request);
+
+        if ($form->isValid()) {
+            $manager->persist($task);
+            $manager->flush();
+
+            $this->addFlash('success', 'La tâche a bien été modifiée.');
+
+            return $this->redirectToRoute('task_list');
+        }
+
+        return $this->render('task/edit.html.twig', [
+            'form' => $form->createView(),
+            'task' => $task,
         ]);
     }
 }
