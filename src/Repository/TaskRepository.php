@@ -3,8 +3,9 @@
 namespace App\Repository;
 
 use App\Entity\Task;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use App\Entity\User;
 use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 
 /**
  * @extends ServiceEntityRepository<Task>
@@ -20,7 +21,20 @@ class TaskRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Task::class);
     }
+    public function findAllTaskByUser(User $user) 
+    {
+        return $this->createQueryBuilder('t')
+            ->addSelect('u')
+            ->leftJoin('t.user', 'u')
+            ->andWhere('u.id = :id')
+            ->setParameter('id', $user)
+            ->orderBy('t.created_at', 'DESC')
+            ->getQuery()
+            ->getResult()
+            ;
 
+
+    }
 //    /**
 //     * @return Task[] Returns an array of Task objects
 //     */
