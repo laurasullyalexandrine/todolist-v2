@@ -36,7 +36,7 @@ class AppFixtures extends Fixture
 
 
         // Utilisateurs
-        for ($u = 1; $u <= 10; $u++) {
+        for ($u = 1; $u <= 500; $u++) {
             $user = new User();
             $user->setUsername($faker->userName())
                 ->setEmail($user->getUsername() . $faker->safeEmailDomain())
@@ -50,7 +50,7 @@ class AppFixtures extends Fixture
                 );
 
             // Les tâches
-            for ($t= 1; $t <= 5; $t++) {
+            for ($t= 1; $t <= 50; $t++) {
                 $task = new Task();
                 $task->setTitle('Tâche ' . $t)
                     ->setContent('Contenu pour les tâches ' . $t)
