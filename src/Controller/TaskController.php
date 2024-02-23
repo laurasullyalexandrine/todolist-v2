@@ -36,20 +36,24 @@ class TaskController extends AbstractController
 
         $form->handleRequest($request);
 
-        if ($form->isValid()) {
-            $this->manager->persist($task);
-            $this->manager->flush();
+        if ($form->isSubmitted() && $form->isValid()) {
 
-            $this->addFlash('success', 'La tâche a été bien été ajoutée.');
+            try {
+                $this->manager->persist($task);
+                $this->manager->flush();
 
-            return $this->redirectToRoute('task_list');
+                $this->addFlash('success', 'La tâche a été bien été ajoutée.');
+                return $this->redirectToRoute('task_list');
+            } catch (\Exception $e) {
+                $this->addFlash('error', 'Une erreur est survenue lors de la création de votre tâche : ' . $e->getMessage());
+                return $this->redirect($request->headers->get('referer'));
+            }
+
+            return $this->render('task/create.html.twig', [
+                'form' => $form->createView(),
+            ]);
         }
-
-        return $this->render('task/create.html.twig', [
-            'form' => $form->createView(),
-        ]);
     }
-
 
     #[Route('/{id}/edit', name: 'edit', methods: ["GET", "POST"])]
     public function edit(Task $task, Request $request): Response
@@ -58,13 +62,16 @@ class TaskController extends AbstractController
 
         $form->handleRequest($request);
 
-        if ($form->isValid()) {
-            $this->manager->persist($task);
-            $this->manager->flush();
+        if ($form->isSubmitted() && $form->isValid()) {
+            try {
+                $this->manager->persist($task);
+                $this->manager->flush();
 
-            $this->addFlash('success', 'La tâche a bien été modifiée.');
-
-            return $this->redirectToRoute('task_list');
+                $this->addFlash('success', 'La tâche a bien été modifiée.');
+                return $this->redirectToRoute('task_list');
+            } catch (\Exception $e) {
+                $this->addFlash('warning', 'Une erreur s\'est produite lors de la modification de votre tâche  ' . '"' . $task->getTitle() . '"' . ' ' . $e->getMessage());
+            }
         }
 
         return $this->render('task/edit.html.twig', [
@@ -72,6 +79,7 @@ class TaskController extends AbstractController
             'task' => $task,
         ]);
     }
+
 
     #[Route('/{id}/toggle', name: 'toggle', methods: ["GET", "POST"])]
     public function toggleTask(Task $task): Response
@@ -83,6 +91,7 @@ class TaskController extends AbstractController
 
         return $this->redirectToRoute('task_list');
     }
+    
 
     #[Route('/{id}/delete', name: 'task_delete', methods: ["GET", "POST"])]
     public function deleteTask(
