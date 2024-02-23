@@ -19,6 +19,9 @@ class RegistrationFormType extends AbstractType
             ->add('username', TextType::class, [
                 'label' => "Nom d'utilisateur"
             ])
+            ->add('email', EmailType::class, [
+                'label' => 'Adresse email'
+            ])
             ->add('password', RepeatedType::class, [
                 'type' => PasswordType::class,
                 'invalid_message' => 'Les deux mots de passe doivent correspondre.',
@@ -29,10 +32,8 @@ class RegistrationFormType extends AbstractType
                 'second_options' => [
                     'label' => 'Tapez le mot de passe à nouveau',
                 ],
-            ])
-            ->add('email', EmailType::class, [
-                'label' => 'Adresse email'
             ]);
+  
     }
 
     public function configureOptions(OptionsResolver $resolver): void
