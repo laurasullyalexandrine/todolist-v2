@@ -5,16 +5,16 @@ namespace App\Controller;
 use App\Entity\User;
 use App\Form\UserType;
 use App\Repository\UserRepository;
+use App\Security\Voter\UserVoter;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 #[Route('/admin/users', name: 'admin_users_')]
-#[IsGranted('ROLE_ADMIN')]
+
 class UserController extends AbstractController
 {
     public function __construct(
@@ -22,9 +22,12 @@ class UserController extends AbstractController
         private EntityManagerInterface $manager,
     ) {
     }
+
     #[Route('/', name: 'list', methods: ["GET"])]
     public function list(UserRepository $userRepository): Response
     {
+        $this->denyAccessUnlessGranted(UserVoter::READ, $this->getUser());
+
         return $this->render('user/list.html.twig', [
             'users' => $userRepository->findAll(),
         ]);
@@ -34,6 +37,8 @@ class UserController extends AbstractController
     #[Route('/create', name: 'create', methods: ["GET", "POST"])]
     public function create(Request $request): Response
     {
+        $this->denyAccessUnlessGranted(UserVoter::NEW, $this->getUser());
+
         $user = new User();
 
         $form = $this->createForm(UserType::class, $user);
@@ -68,6 +73,8 @@ class UserController extends AbstractController
         User $user,
         Request $request
     ) {
+
+        $this->denyAccessUnlessGranted(UserVoter::EDIT, $this->getUser());
         $form = $this->createForm(UserType::class, $user);
         $form->handleRequest($request);
 
