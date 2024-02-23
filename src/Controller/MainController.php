@@ -11,15 +11,16 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 class MainController extends AbstractController
 {
     public function __construct(
-        private TokenStorageInterface $token
+        private TokenStorageInterface $token,
+        private TaskRepository $taskRepository,
     ) {
     }
-    
+
     #[Route('/homepage', name: 'homepage')]
-    public function homepage(TaskRepository $taskRepository): Response
+    public function homepage(): Response
     {
         $user = $this->token->getToken()->getUser();
-        $tasks = $taskRepository->findAllTaskByUser($user);;
+        $tasks = $this->taskRepository->findAllTaskByUser($user);
         return $this->render('main/homepage.html.twig', [
             'tasks' => $tasks,
         ]);
