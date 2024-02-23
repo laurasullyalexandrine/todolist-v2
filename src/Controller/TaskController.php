@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Task;
 use App\Form\TaskType;
 use App\Repository\TaskRepository;
+use App\Security\Voter\TaskVoter;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -25,7 +26,11 @@ class TaskController extends AbstractController
     #[Route('/', name: 'list')]
     public function list(): Response
     {
-        $user = $this->token->getToken()->getUser();
+        $user = $this->getUser();
+        if (!$user) {
+            throw $this->createNotFoundException('Merci de vous connecter.');
+            return $this->redirectToRoute('login');
+        }
 
         $tasks = $this->taskRepository->findAllTaskByUser($user);
 
@@ -49,7 +54,7 @@ class TaskController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            
+
             try {
                 $task->setUser($user);
                 $this->manager->persist($task);
@@ -71,11 +76,14 @@ class TaskController extends AbstractController
     #[Route('/{id}/edit', name: 'edit', methods: ["GET", "POST"])]
     public function edit(Task $task, Request $request): Response
     {
+
         $user = $this->getUser();
         if (!$user) {
             throw $this->createNotFoundException('Merci de vous connecter.');
             return $this->redirectToRoute('login');
         }
+
+        $this->denyAccessUnlessGranted(TaskVoter::EDIT, $task);
 
         $form = $this->createForm(TaskType::class, $task);
         $form->handleRequest($request);
@@ -105,10 +113,13 @@ class TaskController extends AbstractController
         Request $request,
         Task $task
     ): Response {
+
+        $this->denyAccessUnlessGranted(TaskVoter::EDIT, $task);
+
         try {
             $task->toggle(!$task->isIsDone());
             $task->setUpdatedAt(new \DateTimeImmutable());
-            
+
             $this->manager->flush();
 
             $this->addFlash('success', sprintf('La tâche %s a bien été marquée comme faite.', $task->getTitle()));
@@ -125,6 +136,9 @@ class TaskController extends AbstractController
         Request $request,
         Task $task
     ) {
+
+        $this->denyAccessUnlessGranted(TaskVoter::EDIT, $task);
+
         try {
             if (!$task) {
                 throw $this->createNotFoundException('Figure non trouvée.');

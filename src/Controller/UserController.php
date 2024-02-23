@@ -75,6 +75,7 @@ class UserController extends AbstractController
     ) {
 
         $this->denyAccessUnlessGranted(UserVoter::EDIT, $this->getUser());
+
         $form = $this->createForm(UserType::class, $user);
         $form->handleRequest($request);
 
