@@ -36,6 +36,7 @@ class RegistrationController extends AbstractController
             $entityManager->persist($user);
             $entityManager->flush();
 
+            $this->addFlash('success', 'Votre compte est maintenant créé. Bienvenue sur votre ToDoList !');
             return $userAuthenticator->authenticateUser(
                 $user,
                 $authenticator,
