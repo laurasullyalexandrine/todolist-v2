@@ -3,6 +3,7 @@
 	<div class="col-md-12">
 		{% for label, messages in app.flashes %}
 			{% for message in messages %}
+					{{ dump(message) }}
 				<div class="alert alert-{{ label }}">
                 {% if label == "danger" %}
                     <strong>Oops !</strong>

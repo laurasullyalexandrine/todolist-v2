@@ -1,23 +1,42 @@
 {% include "_partial/_head.html.twig" %}
+
 <body>
 	{% include "_partial/_nav.html.twig" %}
-	{% include "_partial/_flash.html.twig" %}
 
+	<!-- Page Content -->
 	<div class="container">
 		<div class="row">
+			<a href="{{ path('register') }}" class="btn btn-primary">Créer un utilisateur</a>
+
+			{% if app.user %}
+				<a href="{{ path('logout') }}" class="pull-right btn btn-danger">Se déconnecter</a>
+			{% endif %}
+
+			{% if not app.user and 'login' != app.request.attributes.get('_route') %}
+				<a href="{{ path('login') }}" class="btn btn-success">Se connecter</a>
+			{% endif %}
+		</div>
+
+		<div class="row">
 			<div class="col-md-12">
+				{% include "_partial/_flash.html.twig" %}
+
 				{% block header_title %}{% endblock %}
-				{% block header_img %}<img class="slide-image" src="{{ asset('img/todolist_homepage.jpg') }}" alt="todo list">{% endblock %}
-                {% block body %}{% endblock %}
+				{% block header_img %}<img class="slide-image" src="{{ asset('img/todolist_homepage.jpg') }}" alt="todo list">
+				{% endblock %}
 			</div>
 		</div>
-	</div>
+
+		<br/>
+
+		<div class="row">
+			<div class="col-md-12"> {% block body %}{% endblock %}
+				</div>
+			</div>
+		</div>
+		<!-- /.container -->
 
 		{% include "_partial/_footer.html.twig" %}
-		{% block javascripts %}
-			{% block importmap %}
-				{{ importmap('app') }}
-			{% endblock %}
-		{% endblock %}
+		{% block javascripts %}{% endblock %}
 	</body>
 </html>
