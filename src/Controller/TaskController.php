@@ -10,11 +10,13 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 #[Route('/tasks', name: 'task_')]
 class TaskController extends AbstractController
 {
     public function __construct(
+        private TokenStorageInterface $token,
         private TaskRepository $taskRepository,
         private EntityManagerInterface $manager,
     ) {
@@ -23,43 +25,59 @@ class TaskController extends AbstractController
     #[Route('/', name: 'list')]
     public function list(): Response
     {
+        $user = $this->token->getToken()->getUser();
+
+        $tasks = $this->taskRepository->findAllTaskByUser($user);
+
         return $this->render('task/list.html.twig', [
-            'tasks' => $this->taskRepository->findAll(),
+            'tasks' => $tasks,
         ]);
     }
 
     #[Route('/create', name: 'create', methods: ["GET", "POST"])]
     public function create(Request $request): Response
     {
-        $task = new Task();
-        $form = $this->createForm(TaskType::class, $task);
+        $user = $this->getUser();
+        if (!$user) {
+            throw $this->createNotFoundException('Merci de vous connecter.');
+            return $this->redirectToRoute('login');
+        }
 
+        $task = new Task();
+
+        $form = $this->createForm(TaskType::class, $task);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-
+            
             try {
+                $task->setUser($user);
                 $this->manager->persist($task);
                 $this->manager->flush();
 
-                $this->addFlash('success', 'La tâche a été bien été ajoutée.');
+                $this->addFlash('success', 'Votre tâche a bien été ajoutée.');
                 return $this->redirectToRoute('task_list');
             } catch (\Exception $e) {
                 $this->addFlash('error', 'Une erreur est survenue lors de la création de votre tâche : ' . $e->getMessage());
                 return $this->redirect($request->headers->get('referer'));
             }
-
-            return $this->render('task/create.html.twig', [
-                'form' => $form->createView(),
-            ]);
         }
+
+        return $this->render('task/create.html.twig', [
+            'form' => $form->createView(),
+        ]);
     }
 
     #[Route('/{id}/edit', name: 'edit', methods: ["GET", "POST"])]
     public function edit(Task $task, Request $request): Response
     {
-        $form = $this->createForm(TaskType::class, $task);
+        $user = $this->getUser();
+        if (!$user) {
+            throw $this->createNotFoundException('Merci de vous connecter.');
+            return $this->redirectToRoute('login');
+        }
 
+        $form = $this->createForm(TaskType::class, $task);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -84,14 +102,15 @@ class TaskController extends AbstractController
     #[Route('/{id}/toggle', name: 'toggle', methods: ["GET", "POST"])]
     public function toggleTask(
         Request $request,
-        Task $task): Response
-    {
+        Task $task
+    ): Response {
         try {
             $task->toggle(!$task->isIsDone());
+            $task->setUpdatedAt(new \DateTimeImmutable());
+            
             $this->manager->flush();
-    
+
             $this->addFlash('success', sprintf('La tâche %s a bien été marquée comme faite.', $task->getTitle()));
-    
             return $this->redirectToRoute('task_list');
         } catch (\Exception $e) {
             $this->addFlash('error', 'Une erreur s\'est produite lors de la modification de votre tâche  ' . '"' . $task->getTitle() . '"' . ' ' . $e->getMessage());
@@ -100,7 +119,7 @@ class TaskController extends AbstractController
     }
 
 
-    #[Route('/{id}/delete', name: 'task_delete', methods: ["GET", "POST"])]
+    #[Route('/{id}/delete', name: 'delete', methods: ["GET", "POST"])]
     public function deleteTask(
         Request $request,
         Task $task
