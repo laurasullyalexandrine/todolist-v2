@@ -89,6 +89,7 @@ class TaskController extends AbstractController
                 return $this->redirectToRoute('task_list');
             } catch (\Exception $e) {
                 $this->addFlash('error', 'Une erreur s\'est produite lors de la modification de votre tâche  ' . '"' . $task->getTitle() . '"' . ' ' . $e->getMessage());
+                return $this->redirect($request->headers->get('referer'));
             }
         }
 
