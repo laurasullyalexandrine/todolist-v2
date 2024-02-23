@@ -70,7 +70,7 @@ class TaskController extends AbstractController
                 $this->addFlash('success', 'La tâche a bien été modifiée.');
                 return $this->redirectToRoute('task_list');
             } catch (\Exception $e) {
-                $this->addFlash('warning', 'Une erreur s\'est produite lors de la modification de votre tâche  ' . '"' . $task->getTitle() . '"' . ' ' . $e->getMessage());
+                $this->addFlash('error', 'Une erreur s\'est produite lors de la modification de votre tâche  ' . '"' . $task->getTitle() . '"' . ' ' . $e->getMessage());
             }
         }
 
@@ -82,16 +82,23 @@ class TaskController extends AbstractController
 
 
     #[Route('/{id}/toggle', name: 'toggle', methods: ["GET", "POST"])]
-    public function toggleTask(Task $task): Response
+    public function toggleTask(
+        Request $request,
+        Task $task): Response
     {
-        $task->toggle(!$task->isIsDone());
-        $this->manager->flush();
-
-        $this->addFlash('success', sprintf('La tâche %s a bien été marquée comme faite.', $task->getTitle()));
-
-        return $this->redirectToRoute('task_list');
-    }
+        try {
+            $task->toggle(!$task->isIsDone());
+            $this->manager->flush();
     
+            $this->addFlash('success', sprintf('La tâche %s a bien été marquée comme faite.', $task->getTitle()));
+    
+            return $this->redirectToRoute('task_list');
+        } catch (\Exception $e) {
+            $this->addFlash('error', 'Une erreur s\'est produite lors de la modification de votre tâche  ' . '"' . $task->getTitle() . '"' . ' ' . $e->getMessage());
+            return $this->redirect($request->headers->get('referer'));
+        }
+    }
+
 
     #[Route('/{id}/delete', name: 'task_delete', methods: ["GET", "POST"])]
     public function deleteTask(
@@ -109,7 +116,7 @@ class TaskController extends AbstractController
             $this->addFlash('success', 'Votre tâche ' . '"' . $task->getTitle() . '"' . ' a été supprimée.');
             return $this->redirectToRoute('task_list');
         } catch (\Exception $e) {
-            $this->addFlash('warning', 'Une erreur s\'est produite lors de la suppression de votre tâche  ' . '"' . $task->getTitle() . '"' . ' ' . $e->getMessage());
+            $this->addFlash('error', 'Une erreur s\'est produite lors de la suppression de votre tâche  ' . '"' . $task->getTitle() . '"' . ' ' . $e->getMessage());
             return $this->redirect($request->headers->get('referer'));
         }
     }
