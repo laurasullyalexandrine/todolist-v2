@@ -19,7 +19,7 @@ class Task
     #[ORM\Column(length: 255)]
     private ?string $content = null;
 
-    #[ORM\Column(options: ["default" => 0])]
+    #[ORM\Column(options: ["default" => false])]
     private ?bool $isDone = null;
 
     #[ORM\Column]
@@ -30,6 +30,17 @@ class Task
 
     #[ORM\ManyToOne(inversedBy: 'tasks')]
     private ?User $user = null;
+
+    public function __construct()
+    {
+        $this->created_at = new \DateTimeImmutable();
+        $this->isDone = false;
+    }
+
+    public function __toString()
+    {
+        return $this->title;
+    }
 
     public function getId(): ?int
     {

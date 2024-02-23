@@ -45,7 +45,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function __construct()
     {
+        $this->created_at = new \DateTimeImmutable();
         $this->tasks = new ArrayCollection();
+    }
+
+    public function __toString()
+    {
+        return $this->username;
     }
 
     public function getId(): ?int
