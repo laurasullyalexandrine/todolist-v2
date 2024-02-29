@@ -28,7 +28,7 @@ class Task
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $updated_at = null;
 
-    #[ORM\ManyToOne(inversedBy: 'tasks')]
+    #[ORM\ManyToOne(inversedBy: 'tasks', cascade: ['persist'])]
     private ?User $user = null;
 
     public function __construct()
