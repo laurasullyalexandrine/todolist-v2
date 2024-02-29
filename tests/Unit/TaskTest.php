@@ -8,6 +8,12 @@ use PHPUnit\Framework\TestCase;
 
 class TaskTest extends TestCase
 {
+    /**
+     * Test the change in status of the task
+     * Adding creation date and changing update date
+     * 
+     * @return void
+     */
     public function testChangeTaskStatus(): void
     {
         $now = new \DateTimeImmutable();
@@ -17,7 +23,6 @@ class TaskTest extends TestCase
         $user->setUsername('Jean')
             ->setEmail('jean.louis@todolist.fr')
             ->setPassword("password");
-
 
         $task = new Task();
         $task->setTitle('Tache test')
@@ -39,13 +44,17 @@ class TaskTest extends TestCase
     }
 
 
+    /**
+     * Test if the task is done
+     *
+     * @return void
+     */
     public function testIfTaskIsDone(): void
     {
         $user = new User();
         $user->setUsername('Pierre')
             ->setEmail('pierre.bachelet@todolist.fr')
             ->setPassword("password");
-
 
         $task = new Task();
         $task->setTitle('Tâche test')
@@ -58,13 +67,17 @@ class TaskTest extends TestCase
         $this->assertEquals(true, $task->isIsDone());
     }
 
+    /**
+     * Test if the task has a user
+     *
+     * @return void
+     */
     public function testGetUserFromTask(): void
     {
         $user = new User();
         $user->setUsername('David')
             ->setEmail('david.charvet@todolist.fr')
             ->setPassword("password");
-
 
         $task = new Task();
         $task->setTitle('Tâche test')
@@ -75,6 +88,11 @@ class TaskTest extends TestCase
         $this->assertSame($user, $task->getUser());
     }
 
+    /**
+     * Test if the task has a title
+     *
+     * @return void
+     */
     public function testGetTitleTask(): void
     {
         $user = new User();
@@ -91,6 +109,11 @@ class TaskTest extends TestCase
         $this->assertSame('Tâche test', $task->getTitle());
     }
 
+    /**
+     * Test if the task has a content
+     *
+     * @return void
+     */
     public function testGetContentTask(): void
     {
         $user = new User();
@@ -107,6 +130,11 @@ class TaskTest extends TestCase
         $this->assertSame('Contenu tâche test', $task->getContent());
     }
 
+    /**
+     * Test the __toString method
+     *
+     * @return void
+     */
     public function testTaskToString(): void
     {
         $user = new User();
