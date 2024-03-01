@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Task;
 use App\Form\TaskType;
 use App\Repository\TaskRepository;
+use App\Repository\UserRepository;
 use App\Security\Voter\TaskVoter;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -19,6 +20,7 @@ class TaskController extends AbstractController
     public function __construct(
         private TokenStorageInterface $token,
         private TaskRepository $taskRepository,
+        private UserRepository $userRepository,
         private EntityManagerInterface $manager,
     ) {
     }
@@ -33,9 +35,13 @@ class TaskController extends AbstractController
         }
 
         $tasks = $this->taskRepository->findAllTaskByUser($user);
+        $anonymous = $this->userRepository->findOneByUsername("anonymous");
+
+        $tasksAnonymous = $this->taskRepository->findAllTaskByUser($anonymous);
 
         return $this->render('task/list.html.twig', [
             'tasks' => $tasks,
+            'tasksAnonymous' => $tasksAnonymous,
         ]);
     }
 
