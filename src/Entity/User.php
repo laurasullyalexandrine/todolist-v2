@@ -107,10 +107,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function getDisplayRole(): string
     {
-        if ($this->roles === "ROLE_SUPER_ADMIN") {
-            return "Super admin";
-        } elseif ($this->roles === "ROLE_SUPER_ADMIN") {
-            return "admin";
+        if ($this->roles === "ROLE_ADMIN") {
+            return "administrateur";
         } else {
             return "utilisateur";
         }
