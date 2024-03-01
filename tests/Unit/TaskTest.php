@@ -5,23 +5,160 @@ namespace App\Tests\Unit;
 use App\Entity\Task;
 use App\Entity\User;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class TaskTest extends TestCase
 {
-    public function testSomething(UserPasswordHasherInterface $hasher): void
+
+    /**
+     * Return a Task Object
+     *
+     * @return Task
+     */
+    public function getEntityTask(): Task
     {
         $user = new User();
-        $user->setUsername('Jean')
-            ->setEmail('jean.louis@todolist.fr')
-            ->setPassword(
-                $hasher->hashPassword(
-                    $user,
-                    'password'
-                )
-            );
+        $user->setUsername('Pierre')
+            ->setEmail('pierre.bachelet@todolist.fr')
+            ->setPassword("password");
 
-        $task = new Task('Tache test', 'Contenu tâche test', "1", $user);
-        $this->assertTrue(0);
+
+        return (new Task())
+            ->setTitle('Titre de la tâche')
+            ->setContent('Contenu de la tâche')
+            ->setIsDone(false)
+            ->setCreatedAt(new \DateTimeImmutable())
+            ->setUser($user);
+    }
+
+    /**
+     * Test the change in status of the task
+     * Adding creation date and changing update date
+     * 
+     * @return void
+     */
+    public function testChangeTaskStatus(): void
+    {
+        $now = new \DateTimeImmutable();
+        $date = $now->format('d-m-Y');
+
+        $task = $this->getEntityTask();
+
+        $this->assertEquals($date, $task->getCreatedAt()->format('d-m-Y'));
+
+        $this->assertFalse($task->isIsDone());
+
+        $task->toggle(true);
+
+        $task->setUpdatedAt(new \DateTimeImmutable());
+
+        $this->assertTrue($task->isIsDone());
+        $this->assertEquals($date, $task->getUpdatedAt()->format('d-m-Y'));
+    }
+
+
+    /**
+     * Test if the task is done
+     *
+     * @return void
+     */
+    public function testIfTaskIsDone(): void
+    {
+        $user = new User();
+        $user->setUsername('Pierre')
+            ->setEmail('pierre.bachelet@todolist.fr')
+            ->setPassword("password");
+
+        $task = $this->getEntityTask();
+        $task->setIsDone(true);
+
+        $this->assertTrue($task->isIsDone());
+
+        $this->assertEquals(true, $task->isIsDone());
+    }
+
+    /**
+     * Test if the task has a user
+     *
+     * @return void
+     */
+    public function testGetUserFromTask(): void
+    {
+        $user = new User();
+        $user->setUsername('David')
+            ->setEmail('david.charvet@todolist.fr')
+            ->setPassword("password");
+
+        $task = new Task();
+        $task->setTitle('Tâche test')
+            ->setContent('Contenu tâche test')
+            ->setIsDone(true)
+            ->setUser($user);
+
+        $this->assertSame($user, $task->getUser());
+    }
+
+    /**
+     * Test if the task has a title
+     *
+     * @return void
+     */
+    public function testGetTitleTask(): void
+    {
+        $user = new User();
+        $user->setUsername('François')
+            ->setEmail('françois.valerie@todolist.fr')
+            ->setPassword("password");
+
+        $task = new Task();
+        $task->setTitle('Tâche test')
+            ->setContent('Contenu tâche test')
+            ->setIsDone(true)
+            ->setUser($user);
+
+        $this->assertSame('Tâche test', $task->getTitle());
+    }
+
+    /**
+     * Test if the task has a content
+     *
+     * @return void
+     */
+    public function testGetContentTask(): void
+    {
+        $user = new User();
+        $user->setUsername('Paul')
+            ->setEmail('paul.valerie@todolist.fr')
+            ->setPassword("password");
+
+        $task = new Task();
+        $task->setTitle('Tâche test')
+            ->setContent('Contenu tâche test')
+            ->setIsDone(true)
+            ->setUser($user);
+
+        $this->assertSame('Contenu tâche test', $task->getContent());
+    }
+
+    /**
+     * Test the __toString method
+     *
+     * @return void
+     */
+    public function testTaskToString(): void
+    {
+        $user = new User();
+        $user->setUsername('Jacques')
+            ->setEmail('jacques.chirac@todolist.fr')
+            ->setPassword("password");
+
+        $task = new Task();
+        $task->setTitle('Tâche test')
+            ->setContent('Contenu tâche test')
+            ->setIsDone(true)
+            ->setUser($user);
+
+        $tastkString = $task->__toString($task->getTitle());
+
+        $this->assertSame($task->getTitle(), $tastkString);
     }
 }
