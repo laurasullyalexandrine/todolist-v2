@@ -9,12 +9,13 @@ use PHPUnit\Framework\TestCase;
 class UserTest extends TestCase
 {
 
+
     /**
      * Test the user role and created_at
      *
      * @return void
      */
-    public function testUserRoleCreatedAt(): void
+    public function testSetUser(): void
     {
         $now = new \DateTimeImmutable();
         $date = $now->format('d-m-Y');
@@ -33,31 +34,11 @@ class UserTest extends TestCase
             ->setCreatedAt(new \DateTimeImmutable())
             ->addTask($task);
 
+        $this->assertEquals('jean.louis@todolist.fr', $user->getEmail());
+
         $this->assertEquals($date, $user->getCreatedAt()->format('d-m-Y'));
 
         $this->assertContains($task, $user->getTasks());
-
-        $this->assertEquals("ROLE_USER", $user->getRoles()[0]);
-
-        $this->assertIsBool($user->removeTask($task)); // Faux
-    }
-
-    /**
-     * Test the user role and updated_at
-     *
-     * @return void
-     */
-    public function testSetRoleUpdatedAt(): void
-    {
-        $now = new \DateTimeImmutable();
-        $date = $now->format('d-m-Y');
-
-        $user = new User();
-        $user->setUsername('Jean')
-            ->setEmail('jean.louis@todolist.fr')
-            ->setRoles(["ROLE_USER"])
-            ->setPassword("password")
-            ->setCreatedAt(new \DateTimeImmutable());
 
         $this->assertEquals("ROLE_USER", $user->getRoles()[0]);
 
