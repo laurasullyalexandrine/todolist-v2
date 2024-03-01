@@ -8,17 +8,19 @@ use PHPUnit\Framework\TestCase;
 
 class UserTest extends TestCase
 {
-
+    /**
+     * Return a User object
+     *
+     * @return User
+     */
     public function getEntityUser(): User
     {
-
         return (new User())
             ->setUsername('Jean')
             ->setEmail('jean.louis@todolist.fr')
             ->setRoles(['ROLE_USER'])
             ->setPassword("password")
             ->setCreatedAt(new \DateTimeImmutable());
-            
     }
 
     /**

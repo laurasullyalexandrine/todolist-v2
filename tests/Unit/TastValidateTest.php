@@ -8,7 +8,11 @@ use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 class TastValidateTest extends KernelTestCase
 {
 
-
+    /**
+     * Return a Task Object
+     *
+     * @return Task
+     */
     public function getEntityTask(): Task
     {
         return (new Task())
@@ -18,6 +22,11 @@ class TastValidateTest extends KernelTestCase
             ->setCreatedAt(new \DateTimeImmutable());
     }
 
+    /**
+     * Test validators
+     *
+     * @return void
+     */
     public function testEntityIsValid(): void
     {
         self::bootKernel();
@@ -30,7 +39,12 @@ class TastValidateTest extends KernelTestCase
         $this->assertCount(0, $errors);
     }
 
-    public function testInvalid()
+    /**
+     * Test validators
+     *
+     * @return void
+     */
+    public function testInvalid(): void
     {
         self::bootKernel();
         $container = static::getContainer();

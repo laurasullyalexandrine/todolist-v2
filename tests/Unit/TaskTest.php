@@ -9,7 +9,11 @@ use PHPUnit\Framework\TestCase;
 class TaskTest extends TestCase
 {
 
-
+    /**
+     * Return a Task Object
+     *
+     * @return Task
+     */
     public function getEntityTask(): Task
     {
         $user = new User();
