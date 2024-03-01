@@ -9,6 +9,17 @@ use PHPUnit\Framework\TestCase;
 class UserTest extends TestCase
 {
 
+    public function getEntityUser(): User
+    {
+
+        return (new User())
+            ->setUsername('Jean')
+            ->setEmail('jean.louis@todolist.fr')
+            ->setRoles(['ROLE_USER'])
+            ->setPassword("password")
+            ->setCreatedAt(new \DateTimeImmutable());
+            
+    }
 
     /**
      * Test the user role and created_at
@@ -26,13 +37,8 @@ class UserTest extends TestCase
             ->setIsDone(false)
             ->setCreatedAt(new \DateTimeImmutable());
 
-        $user = new User();
-        $user->setUsername('Jean')
-            ->setEmail('jean.louis@todolist.fr')
-            ->setRoles(['ROLE_USER'])
-            ->setPassword("password")
-            ->setCreatedAt(new \DateTimeImmutable())
-            ->addTask($task);
+        $user = $this->getEntityUser();
+        $user->addTask($task);
 
         $this->assertEquals('jean.louis@todolist.fr', $user->getEmail());
 
@@ -56,12 +62,9 @@ class UserTest extends TestCase
      *
      * @return void
      */
-    public function testTaskToString(): void
+    public function testUserToString(): void
     {
-        $user = new User();
-        $user->setUsername('Jacques')
-            ->setEmail('jacques.chirac@todolist.fr')
-            ->setPassword("password");
+        $user = $this->getEntityUser();
 
         $userString = $user->__toString($user->getUsername());
 

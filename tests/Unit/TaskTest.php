@@ -10,6 +10,22 @@ class TaskTest extends TestCase
 {
 
 
+    public function getEntityTask(): Task
+    {
+        $user = new User();
+        $user->setUsername('Pierre')
+            ->setEmail('pierre.bachelet@todolist.fr')
+            ->setPassword("password");
+
+
+        return (new Task())
+            ->setTitle('Titre de la tâche')
+            ->setContent('Contenu de la tâche')
+            ->setIsDone(false)
+            ->setCreatedAt(new \DateTimeImmutable())
+            ->setUser($user);
+    }
+
     /**
      * Test the change in status of the task
      * Adding creation date and changing update date
@@ -21,17 +37,7 @@ class TaskTest extends TestCase
         $now = new \DateTimeImmutable();
         $date = $now->format('d-m-Y');
 
-        $user = new User();
-        $user->setUsername('Jean')
-            ->setEmail('jean.louis@todolist.fr')
-            ->setPassword("password");
-
-        $task = new Task();
-        $task->setTitle('Tache test')
-            ->setContent('Contenu tâche test')
-            ->setIsDone(false)
-            ->setCreatedAt(new \DateTimeImmutable())
-            ->setUser($user);
+        $task = $this->getEntityTask();
 
         $this->assertEquals($date, $task->getCreatedAt()->format('d-m-Y'));
 
@@ -58,11 +64,8 @@ class TaskTest extends TestCase
             ->setEmail('pierre.bachelet@todolist.fr')
             ->setPassword("password");
 
-        $task = new Task();
-        $task->setTitle('Tâche test')
-            ->setContent('Contenu tâche test')
-            ->setIsDone(true)
-            ->setUser($user);
+        $task = $this->getEntityTask();
+        $task->setIsDone(true);
 
         $this->assertTrue($task->isIsDone());
 
