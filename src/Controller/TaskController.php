@@ -143,7 +143,7 @@ class TaskController extends AbstractController
         Task $task
     ) {
 
-        $this->denyAccessUnlessGranted(TaskVoter::EDIT, $task);
+        $this->denyAccessUnlessGranted(TaskVoter::DELETE, $task);
 
         try {
             if (!$task) {
