@@ -5,6 +5,8 @@ namespace App\Entity;
 use App\Repository\TaskRepository;
 use Doctrine\ORM\Mapping as ORM;
 
+use Symfony\Component\Validator\Constraints as Assert;
+
 #[ORM\Entity(repositoryClass: TaskRepository::class)]
 class Task
 {
@@ -14,9 +16,11 @@ class Task
     private ?int $id = null;
 
     #[ORM\Column(length: 80)]
+    #[Assert\NotBlank()]
     private ?string $title = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank()]
     private ?string $content = null;
 
     #[ORM\Column(options: ["default" => false])]
