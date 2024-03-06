@@ -41,7 +41,6 @@ class TaskVoter extends Voter
                 if ($user == $subject->getUser()) {
                     return true;
                 }
-
                 break;
         }
 

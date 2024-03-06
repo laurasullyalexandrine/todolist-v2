@@ -8,7 +8,6 @@ use PHPUnit\Framework\TestCase;
 
 class TaskTest extends TestCase
 {
-
     /**
      * Return a Task Object
      *
@@ -21,13 +20,14 @@ class TaskTest extends TestCase
             ->setEmail('pierre.bachelet@todolist.fr')
             ->setPassword("password");
 
-
-        return (new Task())
-            ->setTitle('Titre de la tâche')
+        $task = new Task();
+        $task->setTitle('Titre de la tâche')
             ->setContent('Contenu de la tâche')
             ->setIsDone(false)
-            ->setCreatedAt(new \DateTimeImmutable())
-            ->setUser($user);
+            ->setCreatedAt(new \DateTimeImmutable());
+
+        $user->addTask($task);
+        return $task;
     }
 
     /**
@@ -36,7 +36,7 @@ class TaskTest extends TestCase
      * 
      * @return void
      */
-    public function testChangeTaskStatus(): void
+    public function testToggle(): void
     {
         $now = new \DateTimeImmutable();
         $date = $now->format('d-m-Y');
@@ -61,19 +61,16 @@ class TaskTest extends TestCase
      *
      * @return void
      */
-    public function testIfTaskIsDone(): void
+    public function testGetTask(): void
     {
-        $user = new User();
-        $user->setUsername('Pierre')
-            ->setEmail('pierre.bachelet@todolist.fr')
-            ->setPassword("password");
-
         $task = $this->getEntityTask();
         $task->setIsDone(true);
 
+        $this->assertNull($task->getId());
         $this->assertTrue($task->isIsDone());
 
-        $this->assertEquals(true, $task->isIsDone());
+        $this->assertSame('Titre de la tâche', $task->getTitle());
+        $this->assertSame('Contenu de la tâche', $task->getContent());
     }
 
     /**
@@ -97,46 +94,16 @@ class TaskTest extends TestCase
         $this->assertSame($user, $task->getUser());
     }
 
-    /**
-     * Test if the task has a title
-     *
-     * @return void
-     */
-    public function testGetTitleTask(): void
+    public function testRemoveTask(): void
     {
-        $user = new User();
-        $user->setUsername('François')
-            ->setEmail('françois.valerie@todolist.fr')
-            ->setPassword("password");
+        $task = $this->getEntityTask();
+        $user = $task->getUser();
 
-        $task = new Task();
-        $task->setTitle('Tâche test')
-            ->setContent('Contenu tâche test')
-            ->setIsDone(true)
-            ->setUser($user);
+        $user->removeTask($task);
 
-        $this->assertSame('Tâche test', $task->getTitle());
-    }
+        $this->assertFalse($user->getTasks()->contains($task));
 
-    /**
-     * Test if the task has a content
-     *
-     * @return void
-     */
-    public function testGetContentTask(): void
-    {
-        $user = new User();
-        $user->setUsername('Paul')
-            ->setEmail('paul.valerie@todolist.fr')
-            ->setPassword("password");
-
-        $task = new Task();
-        $task->setTitle('Tâche test')
-            ->setContent('Contenu tâche test')
-            ->setIsDone(true)
-            ->setUser($user);
-
-        $this->assertSame('Contenu tâche test', $task->getContent());
+        $this->assertNull($task->getUser());
     }
 
     /**
@@ -146,19 +113,10 @@ class TaskTest extends TestCase
      */
     public function testTaskToString(): void
     {
-        $user = new User();
-        $user->setUsername('Jacques')
-            ->setEmail('jacques.chirac@todolist.fr')
-            ->setPassword("password");
+        $task = $this->getEntityTask();
 
-        $task = new Task();
-        $task->setTitle('Tâche test')
-            ->setContent('Contenu tâche test')
-            ->setIsDone(true)
-            ->setUser($user);
+        $taskString = $task->__toString();
 
-        $tastkString = $task->__toString($task->getTitle());
-
-        $this->assertSame($task->getTitle(), $tastkString);
+        $this->assertSame($task->getTitle(), $taskString);
     }
 }
