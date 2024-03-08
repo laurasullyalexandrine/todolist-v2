@@ -54,7 +54,6 @@ class SecurityControllerTest extends WebTestCase
 
     public function testLogout(): void
     {
-        $userRepository = $this->client->getContainer()->get('doctrine.orm.entity_manager')->getRepository(User::class);
         $currentUser = $this->getUserTest();
 
         $urlGenerator = $this->client->getContainer()->get('router.default');
