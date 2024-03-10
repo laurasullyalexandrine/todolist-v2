@@ -8,6 +8,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class TaskControllerTest extends WebTestCase
 {
@@ -52,7 +53,7 @@ class TaskControllerTest extends WebTestCase
         $this->assertEquals('/', $redirectUrl);
     }
 
-    public function testGetTaskListByUserSuccessfully(): void
+    public function testGetTaskListByUserSuccessful(): void
     {
         $urlGenerator = $this->client->getContainer()->get('router');
         $this->client->request(Request::METHOD_GET, $urlGenerator->generate('task_create'));
@@ -82,7 +83,7 @@ class TaskControllerTest extends WebTestCase
      *
      * @return void
      */
-    public function testCreateTaskSuccessfully()
+    public function testCreateTaskSuccessful()
     {
         $urlGenerator = $this->client->getContainer()->get('router');
         $this->client->request(Request::METHOD_GET, $urlGenerator->generate('task_create'));
@@ -118,7 +119,7 @@ class TaskControllerTest extends WebTestCase
 
         $this->assertRouteSame('task_list');
 
-        $this->assertSelectorTextContains('div.alert.alert-success', 'Votre tâche a bien été ajoutée');
+        $this->assertSelectorTextContains('div.alert.alert-success', 'Votre tâche a bien été ajoutée.');
     }
 
     /**
@@ -156,12 +157,29 @@ class TaskControllerTest extends WebTestCase
         }
     }
 
+    public function testTaskNoFound(): void
+    {
+        $currentUser = $this->getUserTest();
+
+        $taskRepository = $this->client->getContainer()->get('doctrine.orm.entity_manager')->getRepository(Task::class);
+        $tasks = $taskRepository->findAllTaskByUser($currentUser);
+
+        foreach ($tasks as $task) {
+            $urlGenerator = $this->client->getContainer()->get('router.default');
+            $this->client->request(Request::METHOD_GET, $urlGenerator->generate('task_edit', ['id' => 33]));
+
+            $this->assertNotEquals(33, $task->getId());
+        }
+        $response = $this->client->getResponse();
+        $this->assertResponseStatusCodeSame($response->getStatusCode(404));
+    }
+
     /**
      * Test updating task
      *
      * @return void
      */
-    public function testEditTaskSuccessfully(): void
+    public function testEditTaskSuccessful(): void
     {
         $currentUser = $this->getUserTest();
 
@@ -191,6 +209,40 @@ class TaskControllerTest extends WebTestCase
         $this->assertTrue($this->client->getResponse()->isRedirect());
 
         $this->client->followRedirect();
+
+        $this->assertSelectorTextContains('div.alert.alert-success', 'Superbe ! Votre tâche a bien été modifiée.');
+
+        $this->assertRouteSame('task_list');
+    }
+
+    /**
+     * Test deleting a task
+     *
+     * @return void
+     */
+    public function testDeleteTaskSuccesful(): void
+    {
+        $currentUser = $this->getUserTest();
+
+        $taskRepository = $this->client->getContainer()->get('doctrine.orm.entity_manager')->getRepository(Task::class);
+        $tasks = $taskRepository->findAllTaskByUser($currentUser);
+
+        foreach ($tasks as $task) {
+            $urlGenerator = $this->client->getContainer()->get('router.default');
+            $this->client->request(Request::METHOD_GET, $urlGenerator->generate('task_delete', ['id' => $task->getId()]));
+        }
+
+        $this->client->loginUser($currentUser);
+
+        $this->client->request(Request::METHOD_POST, $urlGenerator->generate('task_delete', ['id' => $task->getId()]));
+
+        $this->assertResponseStatusCodeSame(Response::HTTP_FOUND);
+
+        $this->assertTrue($this->client->getResponse()->isRedirect());
+
+        $this->client->followRedirect();
+
+        $this->assertSelectorTextContains('div.alert.alert-success', 'Superbe ! Votre tâche ' . '"' . $task->getTitle() . '"' . ' a été supprimée.');
 
         $this->assertRouteSame('task_list');
     }
