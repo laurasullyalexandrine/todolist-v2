@@ -82,7 +82,6 @@ class TaskController extends AbstractController
     #[Route('/{id}/edit', name: 'edit', methods: ["GET", "POST"])]
     public function edit(Task $task, Request $request): Response
     {
-
         $user = $this->getUser();
         if (!$user) {
             $this->addFlash('danger', 'Merci de vous connecter');

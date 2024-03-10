@@ -2,7 +2,6 @@
 
 namespace App\Tests\Functional;
 
-use App\Entity\Task;
 use App\Entity\User;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -38,7 +37,7 @@ class MainControllerTest extends WebTestCase
      */
     public function testConnexionDisplayHomepage(): void
     {
-        $crawler = $this->client->request('GET', '/login');
+        $this->client->request('GET', '/login');
 
         $currentUser = $this->getUserTest();
         $this->client->loginUser($currentUser);

@@ -40,7 +40,7 @@ class SecurityControllerTest extends WebTestCase
 
     public function testLoginForm(): void
     {
-        $crawler = $this->client->request('GET', '/');
+        $this->client->request('GET', '/');
 
         $this->assertResponseIsSuccessful();
 
