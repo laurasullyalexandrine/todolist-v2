@@ -30,7 +30,7 @@ class TaskController extends AbstractController
     {
         $user = $this->getUser();
         if (!$user) {
-            throw $this->createNotFoundException('Merci de vous connecter.');
+            $this->addFlash('danger', 'Merci de vous connecter');
             return $this->redirectToRoute('login');
         }
 
@@ -50,7 +50,7 @@ class TaskController extends AbstractController
     {
         $user = $this->getUser();
         if (!$user) {
-            throw $this->createNotFoundException('Merci de vous connecter.');
+            $this->addFlash('danger', 'Merci de vous connecter');
             return $this->redirectToRoute('login');
         }
 
@@ -85,7 +85,7 @@ class TaskController extends AbstractController
 
         $user = $this->getUser();
         if (!$user) {
-            throw $this->createNotFoundException('Merci de vous connecter.');
+            $this->addFlash('danger', 'Merci de vous connecter');
             return $this->redirectToRoute('login');
         }
 
