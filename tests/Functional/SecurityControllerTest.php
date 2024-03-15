@@ -17,6 +17,28 @@ class SecurityControllerTest extends WebTestCase
         $this->client = static::createClient();
     }
 
+    /**
+     * Test the display of the login page
+     *
+     * @return void
+     */
+    public function testDisplayLogin()
+    {
+        $urlGenerator = $this->client->getContainer()->get('router.default');
+        $this->client->request(Request::METHOD_GET, $urlGenerator->generate('login'));
+
+        $this->assertResponseStatusCodeSame(Response::HTTP_OK);
+
+        $this->assertSelectorTextContains('label', 'Nom d\'utilisateur :');
+
+        $this->assertSelectorNotExists('.alert.alert-danger');
+    }
+
+    /**
+     * Get a current user
+     *
+     * @return User
+     */
     public function getUserTest(): User
     {
         $userRepository = $this->client->getContainer()->get('doctrine.orm.entity_manager')->getRepository(User::class);
@@ -25,33 +47,65 @@ class SecurityControllerTest extends WebTestCase
         return $currentUser;
     }
 
-    public function testLoginPage(): void
+    /**
+     * Test for an authentication successful
+     *
+     * @return void
+     */
+    public function testLoginFormSuccessful(): void
     {
-        $currentUser = $this->getUserTest();
-
         $urlGenerator = $this->client->getContainer()->get('router.default');
-
-        $this->client->loginUser($currentUser);
-
         $this->client->request(Request::METHOD_GET, $urlGenerator->generate('login'));
 
+        $this->assertResponseIsSuccessful();
+ 
+        $this->client->submitForm(
+            'Se connecter',
+            [
+                'username' => $this->getUserTest()->getUserIdentifier(),
+                'password' => $this->getUserTest()->getPassword(),
+            ],
+            'POST',
+        );
+
+        $this->assertResponseRedirects();
         $this->assertResponseStatusCodeSame(Response::HTTP_FOUND);
     }
 
-    public function testLoginForm(): void
+    /**
+     * Test for an authentication error
+     *
+     * @return void
+     */
+    public function testLoginFormFailed(): void
     {
-        $this->client->request('GET', '/');
+        $urlGenerator = $this->client->getContainer()->get('router.default');
+        $this->client->request(Request::METHOD_GET, $urlGenerator->generate('login'));
 
         $this->assertResponseIsSuccessful();
 
-        $this->client->submitForm('Se connecter', [
-            'username' => $this->getUserTest()->getUserIdentifier(),
-            'password' => $this->getUserTest()->getPassword(),
-        ]);
+        $this->client->submitForm(
+            'Se connecter',
+            [
+                'username' => 'johndoe@todilist.fr',
+                'password' => 'fakepassword',
+            ],
+            'POST',
+        );
 
-        $this->assertResponseStatusCodeSame(Response::HTTP_FOUND);
+        $this->assertResponseRedirects('/');
+        $this->client->followRedirect();
+
+        $this->assertResponseStatusCodeSame(Response::HTTP_OK);
+
+        $this->assertSelectorExists('.alert.alert-danger');
     }
 
+    /**
+     * Test the disconnection
+     *
+     * @return void
+     */
     public function testLogout(): void
     {
         $currentUser = $this->getUserTest();
