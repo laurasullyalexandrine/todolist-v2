@@ -8,7 +8,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class TaskControllerTest extends WebTestCase
 {
@@ -37,28 +36,29 @@ class TaskControllerTest extends WebTestCase
      *
      * @return void
      */
-    public function testUserNotLoggetInTaskList(): void
+    public function testAuthPageIsRestricted(): void
     {
-        $this->client->request('GET', '/tasks');
+        $this->client->request(Request::METHOD_GET, '/tasks');
 
         $this->assertTrue($this->client->getResponse()->isRedirect());
-
         $this->client->followRedirect();
 
         $response = $this->client->getResponse();
-
         $redirectUrl = $this->client->getResponse()->headers->get('Location');
 
         $this->assertResponseStatusCodeSame($response->getStatusCode(404));
-        $this->assertEquals('/', $redirectUrl);
+
+        $this->assertEquals("/", $redirectUrl);
     }
 
+    /**
+     * Undocumented function
+     *
+     * @return void
+     */
     public function testGetTaskListByUserSuccessful(): void
     {
         $urlGenerator = $this->client->getContainer()->get('router');
-        $this->client->request(Request::METHOD_GET, $urlGenerator->generate('task_create'));
-
-        $this->testUserNotLoggetInTaskList();
 
         $currentUser = $this->getUserTest();
         $this->client->loginUser($currentUser);
@@ -70,10 +70,6 @@ class TaskControllerTest extends WebTestCase
         $this->assertResponseIsSuccessful();
 
         $this->assertResponseStatusCodeSame(Response::HTTP_OK);
-
-        $taskRepository = $this->client->getContainer()->get('doctrine.orm.entity_manager')->getRepository(Task::class);
-
-        $taskRepository->findAllTaskByUser($currentUser);
 
         $this->assertRouteSame('task_list');
     }
@@ -87,8 +83,6 @@ class TaskControllerTest extends WebTestCase
     {
         $urlGenerator = $this->client->getContainer()->get('router');
         $this->client->request(Request::METHOD_GET, $urlGenerator->generate('task_create'));
-
-        $this->testUserNotLoggetInTaskList();
 
         $currentUser = $this->getUserTest();
         $this->client->loginUser($currentUser);
@@ -132,8 +126,6 @@ class TaskControllerTest extends WebTestCase
         $urlGenerator = $this->client->getContainer()->get('router.default');
         $this->client->request(Request::METHOD_GET, $urlGenerator->generate('task_create'));
 
-        $this->testUserNotLoggetInTaskList();
-
         $currentUser = $this->getUserTest();
         $this->client->loginUser($currentUser);
 
@@ -157,22 +149,44 @@ class TaskControllerTest extends WebTestCase
         }
     }
 
-    public function testTaskNoFound(): void
+    /**
+     * Test the task not found
+     *
+     * @return void
+     */
+    public function testTaskNotFound(): void
     {
         $currentUser = $this->getUserTest();
 
+        $urlGenerator = $this->client->getContainer()->get('router.default');
+
         $taskRepository = $this->client->getContainer()->get('doctrine.orm.entity_manager')->getRepository(Task::class);
-        $tasks = $taskRepository->findAllTaskByUser($currentUser);
 
-        foreach ($tasks as $task) {
-            $urlGenerator = $this->client->getContainer()->get('router.default');
-            $this->client->request(Request::METHOD_GET, $urlGenerator->generate('task_edit', ['id' => 33]));
+        $this->client->request(Request::METHOD_GET, $urlGenerator->generate('task_edit', ['id' => 33]));
 
-            $this->assertNotEquals(33, $task->getId());
-        }
-        $response = $this->client->getResponse();
-        $this->assertResponseStatusCodeSame($response->getStatusCode(404));
+        $task = $taskRepository->findOneBy(['user' => $currentUser, 'id' => 33]);
+
+        $this->assertNull($task);
+
+        $this->assertResponseStatusCodeSame(Response::HTTP_NOT_FOUND);
     }
+
+    /**
+     * Test route edit user not connected
+     *
+     * @return void
+     */
+    public function testEditTaskUserNotLogged(): void
+    {
+        $urlGenerator = $this->client->getContainer()->get('router.default');
+        $this->client->request(Request::METHOD_GET, $urlGenerator->generate('task_edit', ['id' => 5946]));
+
+        $this->assertTrue($this->client->getResponse()->isRedirect());
+        $this->client->followRedirect();
+        $this->assertResponseStatusCodeSame(Response::HTTP_OK);
+        $this->assertSelectorExists('.alert.alert-danger');
+    }
+
 
     /**
      * Test updating task
@@ -181,23 +195,19 @@ class TaskControllerTest extends WebTestCase
      */
     public function testEditTaskSuccessful(): void
     {
+        $urlGenerator = $this->client->getContainer()->get('router.default');
+
         $currentUser = $this->getUserTest();
-
-        $taskRepository = $this->client->getContainer()->get('doctrine.orm.entity_manager')->getRepository(Task::class);
-        $tasks = $taskRepository->findAllTaskByUser($currentUser);
-
-        foreach ($tasks as $task) {
-            $urlGenerator = $this->client->getContainer()->get('router.default');
-            $this->client->request(Request::METHOD_GET, $urlGenerator->generate('task_edit', ['id' => $task->getId()]));
-        }
-
-        $this->testUserNotLoggetInTaskList();
-
         $this->client->loginUser($currentUser);
 
-        $this->client->request(Request::METHOD_POST, $urlGenerator->generate('task_edit', ['id' => $task->getId()]));
+        $taskRepository = $this->client->getContainer()->get('doctrine.orm.entity_manager')->getRepository(Task::class);
 
+        $task = $taskRepository->findOneBy(['user' => $currentUser]);
+        $this->client->request(Request::METHOD_GET, $urlGenerator->generate('task_edit', ['id' => $task->getId()]));
+
+        $this->client->request(Request::METHOD_POST, $urlGenerator->generate('task_edit', ['id' => $task->getId()]));
         $this->assertResponseIsSuccessful();
+
 
         $this->client->submitForm('Modifier', [
             'task[title]' => $task->setTitle('Titre modifié de ma tâche 1'),
@@ -215,6 +225,7 @@ class TaskControllerTest extends WebTestCase
         $this->assertRouteSame('task_list');
     }
 
+
     /**
      * Test deleting a task
      *
@@ -223,16 +234,12 @@ class TaskControllerTest extends WebTestCase
     public function testDeleteTaskSuccesful(): void
     {
         $currentUser = $this->getUserTest();
+        $this->client->loginUser($currentUser);
+        $urlGenerator = $this->client->getContainer()->get('router.default');
 
         $taskRepository = $this->client->getContainer()->get('doctrine.orm.entity_manager')->getRepository(Task::class);
-        $tasks = $taskRepository->findAllTaskByUser($currentUser);
 
-        foreach ($tasks as $task) {
-            $urlGenerator = $this->client->getContainer()->get('router.default');
-            $this->client->request(Request::METHOD_GET, $urlGenerator->generate('task_delete', ['id' => $task->getId()]));
-        }
-
-        $this->client->loginUser($currentUser);
+        $task = $taskRepository->findOneBy(['user' => $currentUser]);
 
         $this->client->request(Request::METHOD_POST, $urlGenerator->generate('task_delete', ['id' => $task->getId()]));
 
@@ -245,5 +252,29 @@ class TaskControllerTest extends WebTestCase
         $this->assertSelectorTextContains('div.alert.alert-success', 'Superbe ! Votre tâche ' . '"' . $task->getTitle() . '"' . ' a été supprimée.');
 
         $this->assertRouteSame('task_list');
+    }
+
+    /**
+     * Test the change in task status
+     *
+     * @return void
+     */
+    public function testToggleActionSuccessful()
+    {
+        $currentUser = $this->getUserTest();
+        $this->client->loginUser($currentUser);
+
+        $urlGenerator = $this->client->getContainer()->get('router.default');
+
+        $taskRepository = $this->client->getContainer()->get('doctrine.orm.entity_manager')->getRepository(Task::class);
+
+        $task = $taskRepository->findOneBy(['user' => $currentUser]);
+        $task->toggle(!$task->isIsDone());
+
+
+        $this->client->request(Request::METHOD_POST, $urlGenerator->generate('task_toggle', ['id' => $task->getId()]));
+
+        $task = $taskRepository->find($task->getId());
+        $this->assertFalse($task->isIsDone());
     }
 }
