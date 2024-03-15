@@ -60,18 +60,12 @@ class TaskController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $task->setUser($user);
+            $this->manager->persist($task);
+            $this->manager->flush();
 
-            try {
-                $task->setUser($user);
-                $this->manager->persist($task);
-                $this->manager->flush();
-
-                $this->addFlash('success', 'Votre tâche a bien été ajoutée.');
-                return $this->redirectToRoute('task_list');
-            } catch (\Exception $e) {
-                $this->addFlash('error', 'Une erreur est survenue lors de la création de votre tâche : ' . $e->getMessage());
-                return $this->redirect($request->headers->get('referer'));
-            }
+            $this->addFlash('success', 'Votre tâche a bien été ajoutée.');
+            return $this->redirectToRoute('task_list');
         }
 
         return $this->render('task/create.html.twig', [
@@ -94,16 +88,11 @@ class TaskController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            try {
-                $this->manager->persist($task);
-                $this->manager->flush();
+            $this->manager->persist($task);
+            $this->manager->flush();
 
-                $this->addFlash('success', 'Votre tâche a bien été modifiée.');
-                return $this->redirectToRoute('task_list');
-            } catch (\Exception $e) {
-                $this->addFlash('error', 'Une erreur s\'est produite lors de la modification de votre tâche  ' . '"' . $task->getTitle() . '"' . ' ' . $e->getMessage());
-                return $this->redirect($request->headers->get('referer'));
-            }
+            $this->addFlash('success', 'Votre tâche a bien été modifiée.');
+            return $this->redirectToRoute('task_list');
         }
 
         return $this->render('task/edit.html.twig', [
@@ -120,19 +109,13 @@ class TaskController extends AbstractController
     ): Response {
 
         $this->denyAccessUnlessGranted(TaskVoter::EDIT, $task);
+        $task->toggle(!$task->isIsDone());
+        $task->setUpdatedAt(new \DateTimeImmutable());
 
-        try {
-            $task->toggle(!$task->isIsDone());
-            $task->setUpdatedAt(new \DateTimeImmutable());
+        $this->manager->flush();
 
-            $this->manager->flush();
-
-            $this->addFlash('success', sprintf('La tâche %s a bien été marquée comme faite.', $task->getTitle()));
-            return $this->redirectToRoute('task_list');
-        } catch (\Exception $e) {
-            $this->addFlash('error', 'Une erreur s\'est produite lors de la modification de votre tâche  ' . '"' . $task->getTitle() . '"' . ' ' . $e->getMessage());
-            return $this->redirect($request->headers->get('referer'));
-        }
+        $this->addFlash('success', sprintf('La tâche %s a bien été marquée comme faite.', $task->getTitle()));
+        return $this->redirectToRoute('task_list');
     }
 
 
@@ -144,15 +127,10 @@ class TaskController extends AbstractController
 
         $this->denyAccessUnlessGranted(TaskVoter::DELETE, $task);
 
-        try {
             $this->manager->remove($task);
             $this->manager->flush();
 
             $this->addFlash('success', 'Votre tâche ' . '"' . $task->getTitle() . '"' . ' a été supprimée.');
             return $this->redirectToRoute('task_list');
-        } catch (\Exception $e) {
-            $this->addFlash('error', 'Une erreur s\'est produite lors de la suppression de votre tâche  ' . '"' . $task->getTitle() . '"' . ' ' . $e->getMessage());
-            return $this->redirect($request->headers->get('referer'));
-        }
     }
 }
