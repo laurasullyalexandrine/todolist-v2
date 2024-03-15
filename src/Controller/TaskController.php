@@ -145,10 +145,6 @@ class TaskController extends AbstractController
         $this->denyAccessUnlessGranted(TaskVoter::DELETE, $task);
 
         try {
-            if (!$task) {
-                throw $this->createNotFoundException('Figure non trouvée.');
-            }
-
             $this->manager->remove($task);
             $this->manager->flush();
 
