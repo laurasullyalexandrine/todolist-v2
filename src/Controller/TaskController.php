@@ -104,7 +104,6 @@ class TaskController extends AbstractController
 
     #[Route('/{id}/toggle', name: 'toggle', methods: ["GET", "POST"])]
     public function toggleTask(
-        Request $request,
         Task $task
     ): Response {
 
@@ -121,10 +120,8 @@ class TaskController extends AbstractController
 
     #[Route('/{id}/delete', name: 'delete', methods: ["GET", "POST"])]
     public function deleteTask(
-        Request $request,
         Task $task
     ) {
-
         $this->denyAccessUnlessGranted(TaskVoter::DELETE, $task);
 
             $this->manager->remove($task);
