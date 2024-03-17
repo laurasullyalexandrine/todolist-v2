@@ -37,7 +37,7 @@ class MainControllerTest extends WebTestCase
      */
     public function testConnexionDisplayHomepage(): void
     {
-        $this->client->request('GET', '/login');
+        // $this->client->request('GET', '/login');
 
         $currentUser = $this->getUserTest();
         $this->client->loginUser($currentUser);
