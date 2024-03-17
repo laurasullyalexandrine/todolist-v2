@@ -45,7 +45,6 @@ class UserController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            try {
                 $user->setPassword(
                     $this->hasher->hashPassword(
                         $user,
@@ -58,10 +57,6 @@ class UserController extends AbstractController
 
                 $this->addFlash('success', "L'utilisateur a bien été ajouté.");
                 return $this->redirectToRoute('user_list');
-            } catch (\Exception $e) {
-                $this->addFlash('error', 'Une erreur s\'est produite lors de l\'ajout du nouvel utilisateur  ' . $e->getMessage());
-                return $this->redirect($request->headers->get('referer'));
-            }
         }
         return $this->render('user/create.html.twig', [
             'form' => $form->createView(),
@@ -82,7 +77,6 @@ class UserController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $roles = $form->get('roles')->getData();
 
-            try {
                 $user->setRoles([$roles[0]])
                     ->setPassword(
                         $this->hasher->hashPassword(
@@ -96,10 +90,6 @@ class UserController extends AbstractController
 
                 $this->addFlash('success', "L'utilisateur a bien été modifié.");
                 return $this->redirectToRoute('admin_users_list');
-            } catch (\Exception $e) {
-                $this->addFlash('error', 'Une erreur s\'est produite lors de l\'ajout du nouvel utilisateur  ' . $e->getMessage());
-                return $this->redirect($request->headers->get('referer'));
-            }
         }
 
         return $this->render('user/edit.html.twig', [

@@ -8,10 +8,12 @@ use App\Entity\User;
 use Doctrine\Persistence\ObjectManager;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
-
+/**
+ * @codeCoverageIgnore
+ */
 class AppFixtures extends Fixture
 {
-    public function __construct(private UserPasswordHasherInterface $hasher,)
+    public function __construct(private UserPasswordHasherInterface $hasher)
     {
     }
 
@@ -88,7 +90,7 @@ class AppFixtures extends Fixture
                     )
                 );
 
-            // Les tâches
+            // Tasks
             for ($t = 1; $t <= 15; $t++) {
                 $task = new Task();
                 $task->setTitle('Tâche utilisateur' . $t)

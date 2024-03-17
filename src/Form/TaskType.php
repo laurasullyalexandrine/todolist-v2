@@ -14,7 +14,6 @@ class TaskType extends AbstractType
         $builder
             ->add('title')
             ->add('content')
-            //->add('author') ===> must be the user authenticated
         ;
     }
 

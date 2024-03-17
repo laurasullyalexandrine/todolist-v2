@@ -5,6 +5,8 @@ namespace App\Tests\Unit;
 use App\Entity\Task;
 use App\Entity\User;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+
 
 class UserTest extends TestCase
 {
@@ -24,14 +26,15 @@ class UserTest extends TestCase
     }
 
     /**
-     * Test the user role and created_at
+     * Test the setter and getter
      *
      * @return void
      */
-    public function testSetUser(): void
+    public function testGetSetUser(): void
     {
         $now = new \DateTimeImmutable();
         $date = $now->format('d-m-Y');
+
 
         $task = new Task();
         $task->setTitle('Tache test')
@@ -40,7 +43,14 @@ class UserTest extends TestCase
             ->setCreatedAt(new \DateTimeImmutable());
 
         $user = $this->getEntityUser();
+        
         $user->addTask($task);
+
+        $this->assertNull($user->eraseCredentials());
+
+        $this->assertEquals('password', $user->getPassword());
+
+        $this->assertNull($user->getId());
 
         $this->assertEquals('jean.louis@todolist.fr', $user->getEmail());
 
