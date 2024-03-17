@@ -8,6 +8,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 class UserVoter extends Voter
 {
+    public const CONNECT = 'GET_CONNECT';
     public const READ = 'GET_READ';
     public const EDIT = 'POST_EDIT';
     public const DELETE = 'POST_DELETE';
@@ -17,7 +18,7 @@ class UserVoter extends Voter
     {
         // replace with your own logic
         // https://symfony.com/doc/current/security/voters.html
-        return in_array($attribute, [self::READ, self::EDIT, self::DELETE, self::NEW])
+        return in_array($attribute, [self::CONNECT, self::READ, self::EDIT, self::DELETE, self::NEW])
             && $subject instanceof \App\Entity\User;
     }
 
@@ -31,18 +32,22 @@ class UserVoter extends Voter
 
         // ... (check conditions and return true to grant permission) ...
         switch ($attribute) {
+            case self::CONNECT:
+                if ($user) {
+                    return true;
+                }
             case self::READ:
-                if(in_array("ROLE_ADMIN", $user->getRoles())) {
+                if (in_array("ROLE_ADMIN", $user->getRoles())) {
                     return true;
                 }
                 break;
             case self::EDIT:
-                if(in_array("ROLE_ADMIN", $user->getRoles())) {
+                if (in_array("ROLE_ADMIN", $user->getRoles())) {
                     return true;
                 }
                 break;
             case self::NEW:
-                if(in_array("ROLE_ADMIN", $user->getRoles())) {
+                if (in_array("ROLE_ADMIN", $user->getRoles())) {
                     return true;
                 }
                 break;
