@@ -13,7 +13,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Security\Http\Authentication\UserAuthenticatorInterface;
-
+#[Route('/admin/users', name: 'admin_users_')]
 class RegistrationController extends AbstractController
 {
     #[Route('/register', name: 'register')]
