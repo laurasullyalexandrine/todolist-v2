@@ -41,6 +41,7 @@ class UserControllerTest extends WebTestCase
         $this->client->request(Request::METHOD_GET, $urlGenerator->generate('admin_users_list'));
 
         $this->assertResponseStatusCodeSame(Response::HTTP_FOUND);
+
         $this->assertTrue($this->client->getResponse()->isRedirect());
         $this->client->followRedirect();
 

@@ -36,6 +36,7 @@ class UserVoter extends Voter
                 if ($user) {
                     return true;
                 }
+                break;
             case self::READ:
                 if (in_array("ROLE_ADMIN", $user->getRoles())) {
                     return true;
