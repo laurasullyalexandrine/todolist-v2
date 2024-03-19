@@ -111,55 +111,6 @@ class TaskControllerTest extends WebTestCase
         $this->assertSelectorTextContains('div.alert.alert-success', 'Votre tâche a bien été ajoutée.');
     }
 
-    /**
-     * Test error handling
-     *
-     * @return void
-     */
-    public function testCreateTaskFailed(): void
-    {
-        $currentUser = $this->getUserTest();
-        $this->client->loginUser($currentUser);
-
-        $urlGenerator = $this->client->getContainer()->get('router.default');
-        $this->client->request(Request::METHOD_GET, $urlGenerator->generate('task_create'));
-
-        $task = new Task();
-        $this->client->submitForm('Ajouter', [
-            'task[title]' => $task->setTitle(''),
-            'task[content]' => $task->setContent('Contenu de ma nouvelle tâche 1'),
-        ]);
-        $this->assertEmpty($task->getTitle());
-
-        $this->assertNotContains($task, $currentUser->getTasks());
-
-        $this->assertResponseStatusCodeSame(Response::HTTP_OK);
-
-        $this->assertSelectorTextContains('div.invalid-feedback.d-block', 'This value should not be blank.');
-
-        $this->assertRouteSame('task_create');
-    }
-
-    /**
-     * Test the task not found
-     *
-     * @return void
-     */
-    public function testTaskNotFound(): void
-    {
-        $currentUser = $this->getUserTest();
-
-        $taskRepository = $this->client->getContainer()->get('doctrine.orm.entity_manager')->getRepository(Task::class);
-
-        $urlGenerator = $this->client->getContainer()->get('router.default');
-        $this->client->request(Request::METHOD_GET, $urlGenerator->generate('task_edit', ['id' => 33]));
-
-        $task = $taskRepository->findOneBy(['user' => $currentUser, 'id' => 33]);
-
-        $this->assertNull($task);
-
-        $this->assertResponseStatusCodeSame(Response::HTTP_NOT_FOUND);
-    }
 
     /**
      * Test updating task

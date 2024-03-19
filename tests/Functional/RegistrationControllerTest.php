@@ -89,10 +89,10 @@ class RegistrationControllerTest extends WebTestCase
 
         $formData = [
             'registration_form[roles][0]' => 'ROLE_USER',
-            'registration_form[username]' => 'julie77',
-            'registration_form[email]' => 'julie77@todolist.fr',
-            'registration_form[password][first]' => 'password_2',
-            'registration_form[password][second]' => 'password_2',
+            'registration_form[username]' => 'françois',
+            'registration_form[email]' => 'françois@todolist.fr',
+            'registration_form[password][first]' => 'password',
+            'registration_form[password][second]' => 'password',
         ];
 
         $crawler =  $this->client->request(Request::METHOD_POST, $urlGenerator->generate('admin_users_register'));
