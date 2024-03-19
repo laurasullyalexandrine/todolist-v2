@@ -7,6 +7,7 @@ use App\Form\TaskType;
 use App\Repository\TaskRepository;
 use App\Repository\UserRepository;
 use App\Security\Voter\TaskVoter;
+use App\Security\Voter\UserVoter;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -29,10 +30,8 @@ class TaskController extends AbstractController
     public function list(): Response
     {
         $user = $this->getUser();
-        if (!$user) {
-            $this->addFlash('danger', 'Merci de vous connecter');
-            return $this->redirectToRoute('login');
-        }
+
+        $this->denyAccessUnlessGranted(UserVoter::CONNECT, $user);
 
         $tasks = $this->taskRepository->findAllTaskByUser($user);
         $anonymous = $this->userRepository->findOneByUsername("anonymous");
@@ -49,10 +48,7 @@ class TaskController extends AbstractController
     public function create(Request $request): Response
     {
         $user = $this->getUser();
-        if (!$user) {
-            $this->addFlash('danger', 'Merci de vous connecter');
-            return $this->redirectToRoute('login');
-        }
+        $this->denyAccessUnlessGranted(UserVoter::CONNECT, $user);
 
         $task = new Task();
 
@@ -77,10 +73,7 @@ class TaskController extends AbstractController
     public function edit(Task $task, Request $request): Response
     {
         $user = $this->getUser();
-        if (!$user) {
-            $this->addFlash('danger', 'Merci de vous connecter');
-            return $this->redirectToRoute('login');
-        }
+        $this->denyAccessUnlessGranted(UserVoter::CONNECT, $user);
 
         $this->denyAccessUnlessGranted(TaskVoter::EDIT, $task);
 
@@ -122,12 +115,16 @@ class TaskController extends AbstractController
     public function deleteTask(
         Task $task
     ) {
+
+        $user = $this->getUser();
+        $this->denyAccessUnlessGranted(UserVoter::CONNECT, $user);
+
         $this->denyAccessUnlessGranted(TaskVoter::DELETE, $task);
 
-            $this->manager->remove($task);
-            $this->manager->flush();
+        $this->manager->remove($task);
+        $this->manager->flush();
 
-            $this->addFlash('success', 'Votre tâche ' . '"' . $task->getTitle() . '"' . ' a été supprimée.');
-            return $this->redirectToRoute('task_list');
+        $this->addFlash('success', 'Votre tâche ' . '"' . $task->getTitle() . '"' . ' a été supprimée.');
+        return $this->redirectToRoute('task_list');
     }
 }

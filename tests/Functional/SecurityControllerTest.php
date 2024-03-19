@@ -18,6 +18,20 @@ class SecurityControllerTest extends WebTestCase
     }
 
     /**
+     * Get a current user
+     *
+     * @return User
+     */
+    public function getUserTest(): User
+    {
+        $userRepository = $this->client->getContainer()->get('doctrine.orm.entity_manager')->getRepository(User::class);
+        $currentUser = $userRepository->findOneByUsername("laura");
+
+        return $currentUser;
+    }
+
+
+    /**
      * Test the display of the login page
      *
      * @return void
@@ -34,18 +48,6 @@ class SecurityControllerTest extends WebTestCase
         $this->assertSelectorNotExists('.alert.alert-danger');
     }
 
-    /**
-     * Get a current user
-     *
-     * @return User
-     */
-    public function getUserTest(): User
-    {
-        $userRepository = $this->client->getContainer()->get('doctrine.orm.entity_manager')->getRepository(User::class);
-        $currentUser = $userRepository->findOneByUsername("Laura");
-
-        return $currentUser;
-    }
 
     /**
      * Test for an authentication successful
@@ -55,21 +57,39 @@ class SecurityControllerTest extends WebTestCase
     public function testLoginFormSuccessful(): void
     {
         $urlGenerator = $this->client->getContainer()->get('router.default');
-        $this->client->request(Request::METHOD_GET, $urlGenerator->generate('login'));
+        $crawler = $this->client->request(Request::METHOD_GET, $urlGenerator->generate('login'));
 
         $this->assertResponseIsSuccessful();
- 
-        $this->client->submitForm(
-            'Se connecter',
-            [
-                'username' => $this->getUserTest()->getUserIdentifier(),
-                'password' => $this->getUserTest()->getPassword(),
-            ],
-            'POST',
-        );
 
-        $this->assertResponseRedirects();
-        $this->assertResponseStatusCodeSame(Response::HTTP_FOUND);
+        $form = $crawler->selectButton('Se connecter')->form();
+        $form['username'] = 'laura';
+        $form['password'] = 'admin';
+        $this->client->submit($form);
+
+        $this->assertTrue($this->client->getResponse()->isRedirect());
+        $this->client->followRedirect();
+
+        $this->assertEquals('homepage', $this->client->getRequest()->attributes->get('_route'));
+    }
+
+    /**
+     * Test the redirect for user authenticate
+     *
+     * @return void
+     */
+    public function testRedirectIfUserAuthenticated()
+    {
+        $currentUser = $this->getUserTest();
+        $this->client->loginUser($currentUser);
+
+        $urlGenerator = $this->client->getContainer()->get('router.default');
+        $this->client->request(Request::METHOD_GET, $urlGenerator->generate('login'));
+
+        $this->assertTrue($this->client->getResponse()->isRedirect());
+
+        $this->client->followRedirect();
+
+        $this->assertRouteSame('homepage');
     }
 
     /**

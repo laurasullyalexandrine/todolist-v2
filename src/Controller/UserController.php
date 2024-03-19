@@ -14,7 +14,6 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 #[Route('/admin/users', name: 'admin_users_')]
-
 class UserController extends AbstractController
 {
     public function __construct(
@@ -34,35 +33,6 @@ class UserController extends AbstractController
     }
 
 
-    #[Route('/create', name: 'create', methods: ["GET", "POST"])]
-    public function create(Request $request): Response
-    {
-        $this->denyAccessUnlessGranted(UserVoter::NEW, $this->getUser());
-
-        $user = new User();
-
-        $form = $this->createForm(UserType::class, $user);
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-                $user->setPassword(
-                    $this->hasher->hashPassword(
-                        $user,
-                        $form->get('password')->getData()
-                    )
-                );
-
-                $this->manager->persist($user);
-                $this->manager->flush();
-
-                $this->addFlash('success', "L'utilisateur a bien été ajouté.");
-                return $this->redirectToRoute('user_list');
-        }
-        return $this->render('user/create.html.twig', [
-            'form' => $form->createView(),
-        ]);
-    }
-
     #[Route('/{id}/edit', name: 'edit', methods: ["GET", "POST"])]
     public function edit(
         User $user,
@@ -75,21 +45,18 @@ class UserController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $roles = $form->get('roles')->getData();
+            $user->setPassword(
+                $this->hasher->hashPassword(
+                    $user,
+                    $form->get('password')->getData()
+                )
+            );
 
-                $user->setRoles([$roles[0]])
-                    ->setPassword(
-                        $this->hasher->hashPassword(
-                            $user,
-                            $form->get('password')->getData()
-                        )
-                    );
+            $this->manager->persist($user);
+            $this->manager->flush();
 
-                $this->manager->persist($user);
-                $this->manager->flush();
-
-                $this->addFlash('success', "L'utilisateur a bien été modifié.");
-                return $this->redirectToRoute('admin_users_list');
+            $this->addFlash('success', "L'utilisateur a bien été modifié.");
+            return $this->redirectToRoute('admin_users_list');
         }
 
         return $this->render('user/edit.html.twig', [

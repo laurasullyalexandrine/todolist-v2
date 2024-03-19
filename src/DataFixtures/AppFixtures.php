@@ -34,7 +34,7 @@ class AppFixtures extends Fixture
             )
             ->setCreatedAt(new \DateTimeImmutable());
 
-        for ($t = 1; $t <= 15; $t++) {
+        for ($t = 1; $t <= 8; $t++) {
             $taskAdmin = new Task();
             $taskAdmin->setTitle('Tâche administration ' . $t)
                 ->setContent('Contenu pour les tâches d\'administration ' . $t)
@@ -61,7 +61,7 @@ class AppFixtures extends Fixture
             )
             ->setCreatedAt(new \DateTimeImmutable());
 
-        for ($t = 1; $t <= 15; $t++) {
+        for ($t = 1; $t <= 13; $t++) {
             $taskAnonymous = new Task();
             $taskAnonymous->setTitle('Tâche anonyme ' . $t)
                 ->setContent('Contenu pour les tâches anonymes ' . $t)
@@ -77,7 +77,7 @@ class AppFixtures extends Fixture
 
 
         // Users
-        for ($u = 1; $u <= 200; $u++) {
+        for ($u = 1; $u <= 50; $u++) {
             $user = new User();
             $user->setUsername($faker->userName())
                 ->setEmail($user->getUsername() . '@todolist.fr')
@@ -91,7 +91,7 @@ class AppFixtures extends Fixture
                 );
 
             // Tasks
-            for ($t = 1; $t <= 15; $t++) {
+            for ($t = 1; $t <= 10; $t++) {
                 $task = new Task();
                 $task->setTitle('Tâche utilisateur' . $t)
                     ->setContent('Contenu pour les tâches des utilisateurs' . $t)

@@ -13,17 +13,13 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Security\Http\Authentication\UserAuthenticatorInterface;
-
+#[Route('/admin/users', name: 'admin_users_')]
 class RegistrationController extends AbstractController
 {
     #[Route('/register', name: 'register')]
     public function register(Request $request, UserPasswordHasherInterface $userPasswordHasher, UserAuthenticatorInterface $userAuthenticator, LoginFormAuthenticator $authenticator, EntityManagerInterface $entityManager): Response
     {
         $user = $this->getUser();
-        if (!$user) {
-            $this->addFlash('danger', 'Merci de vous connecter');
-            return $this->redirectToRoute('login');
-        }
 
         $this->denyAccessUnlessGranted(UserVoter::NEW, $user);
 
