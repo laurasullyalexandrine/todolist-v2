@@ -89,8 +89,8 @@ class RegistrationControllerTest extends WebTestCase
 
         $formData = [
             'registration_form[roles][0]' => 'ROLE_USER',
-            'registration_form[username]' => 'françois',
-            'registration_form[email]' => 'françois@todolist.fr',
+            'registration_form[username]' => 'naim',
+            'registration_form[email]' => 'naim@todolist.fr',
             'registration_form[password][first]' => 'password',
             'registration_form[password][second]' => 'password',
         ];
