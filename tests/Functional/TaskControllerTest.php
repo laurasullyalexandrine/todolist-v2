@@ -26,7 +26,7 @@ class TaskControllerTest extends WebTestCase
     public function getUserTest(): User
     {
         $userRepository = $this->client->getContainer()->get('doctrine.orm.entity_manager')->getRepository(User::class);
-        $currentUser = $userRepository->findOneByUsername("raymond72");
+        $currentUser = $userRepository->findOneByUsername("wcosta");
 
         return $currentUser;
     }

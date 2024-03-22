@@ -82,7 +82,7 @@ class UserControllerTest extends WebTestCase
 
         $userRepository = $this->client->getContainer()->get('doctrine.orm.entity_manager')->getRepository(User::class);
 
-        $user = $userRepository->findOneByUsername(['user' => 'raymond72']);
+        $user = $userRepository->findOneByUsername(['user' => 'emmanuelle38']);
 
         $urlGenerator = $this->client->getContainer()->get('router');
 
@@ -90,8 +90,8 @@ class UserControllerTest extends WebTestCase
         $this->assertResponseIsSuccessful();
 
         $this->client->submitForm('Modifier', [
-            'user[username]' => 'raymond72',
-            'user[email]' => 'raymond72@todolist.fr',
+            'user[username]' => 'emmanuelle38',
+            'user[email]' => 'emmanuelle38@todolist.fr',
             'user[password][first]' => 'password_2',
             'user[password][second]' => 'password_2',
         ]);
@@ -114,7 +114,7 @@ class UserControllerTest extends WebTestCase
 
         $userRepository = $this->client->getContainer()->get('doctrine.orm.entity_manager')->getRepository(User::class);
 
-        $user = $userRepository->findOneByUsername(['user' => 'raymond72']);
+        $user = $userRepository->findOneByUsername(['user' => 'emmanuelle38']);
 
         $urlGenerator = $this->client->getContainer()->get('router');
 
@@ -123,8 +123,8 @@ class UserControllerTest extends WebTestCase
 
         $formData = [
             'user[roles][1]' => 'ROLE_ADMIN',
-            'user[username]' => 'raymond72',
-            'user[email]' => 'raymond72@todolist.fr',
+            'user[username]' => 'emmanuelle38',
+            'user[email]' => 'emmanuelle38@todolist.fr',
             'user[password][first]' => 'password_2',
             'user[password][second]' => 'password_2',
         ];
@@ -145,7 +145,7 @@ class UserControllerTest extends WebTestCase
 
         $this->client->followRedirect();
 
-        $updatedUser = $userRepository->findOneByUsername('raymond72');
+        $updatedUser = $userRepository->findOneByUsername('emmanuelle38');
 
         $this->assertTrue(in_array('ROLE_ADMIN', $updatedUser->getRoles()));
 

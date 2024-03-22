@@ -1,0 +1,17 @@
+when@test:
+    dama_doctrine_test:
+        enable_static_connection: true
+        enable_static_meta_data_cache: true
+        enable_static_query_cache: true
+
+doctrine:
+    dbal:
+        default_connection: default
+        connections:
+            default:
+                dbname:               ~
+                host:                 localhost
+                port:                 ~
+                user:                 root
+                password:             ~
+                use_savepoints: true

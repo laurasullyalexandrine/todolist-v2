@@ -89,8 +89,8 @@ class RegistrationControllerTest extends WebTestCase
 
         $formData = [
             'registration_form[roles][0]' => 'ROLE_USER',
-            'registration_form[username]' => 'naim',
-            'registration_form[email]' => 'naim@todolist.fr',
+            'registration_form[username]' => 'francis',
+            'registration_form[email]' => 'francis@todolist.fr',
             'registration_form[password][first]' => 'password',
             'registration_form[password][second]' => 'password',
         ];
@@ -112,7 +112,7 @@ class RegistrationControllerTest extends WebTestCase
 
         $this->client->followRedirect();
 
-        $updatedUser = $userRepository->findOneByUsername('arnaud972');
+        $updatedUser = $userRepository->findOneByUsername('francis');
 
         $this->assertTrue(in_array('ROLE_USER', $updatedUser->getRoles()));
 
