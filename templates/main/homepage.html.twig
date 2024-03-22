@@ -1,22 +1,30 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Accueil Todo List!{% endblock %}
+{% block title %}Accueil Todo List!
+{% endblock %}
 
 {% block header_title %}
-    <h1>Bienvenue sur Todo List, l'application vous permettant de gérer l'ensemble de vos tâches sans effort !</h1>
+	<h1 class="fs-3 m-3">Bienvenue sur Todo List, l'application vous permettant de gérer l'ensemble de vos tâches sans effort !</h1>
 {% endblock %}
 
 {% block body %}
-    <div class="row">
-        <a href="{{ path('task_create') }}" class="btn btn-success">Créer une nouvelle tâche</a>
-        {% if tasks|length < 1 %}
-            <div class="text-center text-danger fs-6 my-4">
-                Vous n'avez pas encore de tâche enregistrée. Créer une nouvelle tâche. 
-            </div>
-        {% endif %}
-        {% if tasks|length > 0 %}
-            <a href="{{ path('task_list') }}" class="btn btn-info">Consulter la liste des tâches à faire</a>
-            <a href="" class="btn btn-secondary">Consulter la liste des tâches terminées</a>
-        {% endif %}
-    </div>
+	<ul class="list-group list-group-flush">
+		<li class="list-group-item">
+			<a href="{{ path('task_create') }}" class="list-group-item">Créer une nouvelle tâche</a>
+		</li>
+		{% if tasks|length < 1 %}
+			<li class="list-group-item text-danger">
+				Vous n'avez pas encore de tâche enregistrée. Créer une nouvelle tâche.
+			</li>
+		{% endif %}
+
+		{% if tasks|length > 0 %}
+			<li class="list-group-item">
+                <a class="list-group-item" href="{{ path('task_list') }}">Consulter la liste des tâches à faire</a>
+            </li>
+		    <li class="list-group-item">
+                <a class="list-group-item" href="#">Consulter la liste des tâches terminées</a>
+            </li>
+		{% endif %}
+	</ul>
 {% endblock %}

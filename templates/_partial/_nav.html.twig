@@ -1,9 +1,23 @@
-<nav class="navbar navbar-light navbar-fixed-top" style="background-color: #e3f2fd;" role="navigation">
-	<div class="container">
-		<div class="navbar-header">
-			<a class="navbar-brand" href="#">To Do List app</a>
 
-			<img src="{{ asset('img/Logo_OpenClassrooms.png') }}" alt="OpenClassrooms"/>
-		</div>
-	</div>
+<nav class="navbar navbar-expand-lg" style="background-color: #95a5a6;" role="navigation">
+  <div class="container">
+    <a class="navbar-brand title-main" href="#">To Do List app</a>
+	<img src="{{ asset('img/Logo_OpenClassrooms.png') }}" alt="OpenClassrooms"/>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+      <div class="navbar-nav">
+		{% if app.user %}
+        	<a class="nav-link active" aria-current="page" href="{{ path('homepage')}}">Accueil</a>
+		{% endif %}
+		{% if is_granted ("ROLE_ADMIN") %}
+        <a class="nav-link" href="{{ path('admin_users_list') }}">Administration</a>
+		{% endif %}
+		{% if app.user %}
+        <a class="nav-link" href="{{ path('logout') }}" style>Se déconnecter</a>
+		{% endif %}
+      </div>
+    </div>
+  </div>
 </nav>

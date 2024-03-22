@@ -4,40 +4,31 @@
 	{% include "_partial/_nav.html.twig" %}
 
 	<!-- Page Content -->
-	<div class="container">
-		<div class="row">
-			{% if app.user and is_granted("ROLE_ADMIN") %}
-				<a href="{{ path('admin_users_register') }}" class="btn btn-primary">Créer un utilisateur</a>
-			{% endif %}
-			{% if app.user %}
-				<a href="{{ path('logout') }}" class="pull-right btn btn-danger">Se déconnecter</a>
-			{% endif %}
-
+	<div class="container-fluid d-flex">
+		<div>
 			{% if not app.user and 'login' != app.request.attributes.get('_route') %}
 				<a href="{{ path('login') }}" class="btn btn-success">Se connecter</a>
 			{% endif %}
+
+			{% include "_partial/_flash.html.twig" %}
+
+			{% block header_img %}
+				<p>
+					<img class="size-home" src="{{ asset('img/todolist-home-picture.png') }}" alt="todo list">
+				</p>
+			{% endblock %}
+
+		</div>
+		<div>
+			{% block header_title %}{% endblock %}
+			{% block body %}{% endblock %}
 		</div>
 
-		<div class="row">
-			<div class="col-md-12">
-				{% include "_partial/_flash.html.twig" %}
 
-				{% block header_title %}{% endblock %}
-				{% block header_img %}<img class="slide-image" src="{{ asset('img/todolist_homepage.jpg') }}" alt="todo list">
-				{% endblock %}
-			</div>
-		</div>
+	</div>
 
-		<br/>
+	<!-- /.container -->
 
-		<div class="row">
-			<div class="col-md-12"> {% block body %}{% endblock %}
-				</div>
-			</div>
-		</div>
-		<!-- /.container -->
-
-		{% include "_partial/_footer.html.twig" %}
-		{% block javascripts %}{% endblock %}
-	</body>
-</html>
+	{% include "_partial/_footer.html.twig" %}
+	{% block javascripts %}{% endblock %}
+</body></html>
