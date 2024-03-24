@@ -132,7 +132,11 @@ class UserControllerTest extends WebTestCase
     }
 
 
-
+    /**
+     * Test checkboxes
+     *
+     * @return void
+     */
     public function testCheckboxRoles(): void
     {
         $currentAdmin = $this->getAdminTest();
