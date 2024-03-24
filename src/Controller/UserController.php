@@ -5,7 +5,6 @@ namespace App\Controller;
 use App\Entity\User;
 use App\Form\UserType;
 use App\Repository\UserRepository;
-use App\Security\Voter\UserVoter;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -14,8 +13,9 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-#[IsGranted('ROLE_ADMIN')]
+
 #[Route('/admin/users', name: 'admin_users_')]
+#[IsGranted('ROLE_ADMIN')]
 class UserController extends AbstractController
 {
     public function __construct(
@@ -27,11 +27,6 @@ class UserController extends AbstractController
     #[Route('/', name: 'list', methods: ["GET"])]
     public function list(UserRepository $userRepository): Response
     {
-        if (!$this->getUser()) {
-            $this->addFlash('danger', 'Merci de vous connecter!');
-            return $this->redirectToRoute('login');
-        }
-
         return $this->render('user/list.html.twig', [
             'users' => $userRepository->findAll(),
         ]);
@@ -43,11 +38,6 @@ class UserController extends AbstractController
         User $user,
         Request $request
     ) {
-        if (!$this->getUser()) {
-            $this->addFlash('danger', 'Merci de vous connecter!');
-            return $this->redirectToRoute('login');
-        }
-
         $form = $this->createForm(UserType::class, $user);
         $form->handleRequest($request);
 

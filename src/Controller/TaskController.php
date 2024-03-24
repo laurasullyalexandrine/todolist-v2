@@ -29,16 +29,36 @@ class TaskController extends AbstractController
     #[Route('/', name: 'list')]
     public function list(): Response
     {
-        $user = $this->getUser();
+        if (!$this->getUser()) {
+            $this->addFlash('danger', 'Merci de vous connecter!');
+            return $this->redirectToRoute('login');
+        }
 
-        $this->denyAccessUnlessGranted(UserVoter::CONNECT, $user);
-
-        $tasks = $this->taskRepository->findAllTaskByUser($user);
+        $tasks = $this->taskRepository->findByIsDoneFalse($this->getUser());
         $anonymous = $this->userRepository->findOneByUsername("anonymous");
 
-        $tasksAnonymous = $this->taskRepository->findAllTaskByUser($anonymous);
+        $tasksAnonymous = $this->taskRepository->findByIsDoneFalse($anonymous);
 
         return $this->render('task/list.html.twig', [
+            'tasks' => $tasks,
+            'tasksAnonymous' => $tasksAnonymous,
+        ]);
+    }
+
+    #[Route('/list-is-done', name: 'list_is_done')]
+    public function listIsDone(): Response
+    {
+        if (!$this->getUser()) {
+            $this->addFlash('danger', 'Merci de vous connecter!');
+            return $this->redirectToRoute('login');
+        }
+
+        $tasks = $this->taskRepository->findByIsDoneTrue($this->getUser());
+        $anonymous = $this->userRepository->findOneByUsername("anonymous");
+
+        $tasksAnonymous = $this->taskRepository->findByIsDoneTrue($anonymous);
+
+        return $this->render('task/list_is_done.html.twig', [
             'tasks' => $tasks,
             'tasksAnonymous' => $tasksAnonymous,
         ]);
@@ -47,8 +67,10 @@ class TaskController extends AbstractController
     #[Route('/create', name: 'create', methods: ["GET", "POST"])]
     public function create(Request $request): Response
     {
-        $user = $this->getUser();
-        $this->denyAccessUnlessGranted(UserVoter::CONNECT, $user);
+        if (!$this->getUser()) {
+            $this->addFlash('danger', 'Merci de vous connecter!');
+            return $this->redirectToRoute('login');
+        }
 
         $task = new Task();
 
@@ -56,7 +78,7 @@ class TaskController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $task->setUser($user);
+            $task->setUser($this->getUser());
             $this->manager->persist($task);
             $this->manager->flush();
 
@@ -72,8 +94,10 @@ class TaskController extends AbstractController
     #[Route('/{id}/edit', name: 'edit', methods: ["GET", "POST"])]
     public function edit(Task $task, Request $request): Response
     {
-        $user = $this->getUser();
-        $this->denyAccessUnlessGranted(UserVoter::CONNECT, $user);
+        if (!$this->getUser()) {
+            $this->addFlash('danger', 'Merci de vous connecter!');
+            return $this->redirectToRoute('login');
+        }
 
         $this->denyAccessUnlessGranted(TaskVoter::EDIT, $task);
 
@@ -116,8 +140,10 @@ class TaskController extends AbstractController
         Task $task
     ) {
 
-        $user = $this->getUser();
-        $this->denyAccessUnlessGranted(UserVoter::CONNECT, $user);
+        if (!$this->getUser()) {
+            $this->addFlash('danger', 'Merci de vous connecter!');
+            return $this->redirectToRoute('login');
+        }
 
         $this->denyAccessUnlessGranted(TaskVoter::DELETE, $task);
 
