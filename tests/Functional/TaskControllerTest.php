@@ -26,7 +26,7 @@ class TaskControllerTest extends WebTestCase
     public function getUserTest(): User
     {
         $userRepository = $this->client->getContainer()->get('doctrine.orm.entity_manager')->getRepository(User::class);
-        $currentUser = $userRepository->findOneByUsername("wcosta");
+        $currentUser = $userRepository->findOneByUsername("arenard");
 
         return $currentUser;
     }
@@ -51,12 +51,13 @@ class TaskControllerTest extends WebTestCase
         $this->assertEquals("/", $redirectUrl);
     }
 
+
     /**
-     * Test access to road with authorization
+     * Test road access to-do list with authorization
      *
      * @return void
      */
-    public function testGetTaskListByUserSuccessful(): void
+    public function testGetTaskListIsDoneFalseByUserSuccessful(): void
     {
         $urlGenerator = $this->client->getContainer()->get('router');
 
@@ -72,6 +73,50 @@ class TaskControllerTest extends WebTestCase
 
         $this->assertRouteSame('task_list');
     }
+
+
+    /**
+     * Test the road to the tasks to be done
+     *
+     * @return void
+     */
+    public function testGetTaskListIsDoneTrueByUserSuccessful(): void
+    {
+        $urlGenerator = $this->client->getContainer()->get('router');
+
+        $currentUser = $this->getUserTest();
+        $this->client->loginUser($currentUser);
+
+        $urlGenerator = $this->client->getContainer()->get('router.default');
+        $this->client->request(Request::METHOD_GET, $urlGenerator->generate('task_list_is_done'));
+
+        $this->assertResponseIsSuccessful();
+
+        $this->assertResponseStatusCodeSame(Response::HTTP_OK);
+
+        $this->assertRouteSame('task_list_is_done');
+    }
+
+    /**
+     * Test route access list of completed tasks
+     *
+     * @return void
+     */
+    public function testGetTaskListIsDoneTrueByNotLoggedIn(): void
+    {
+        $urlGenerator = $this->client->getContainer()->get('router');
+
+        $urlGenerator = $this->client->getContainer()->get('router.default');
+        $this->client->request(Request::METHOD_GET, $urlGenerator->generate('task_list_is_done'));
+
+        $this->client->followRedirect();
+
+        $this->assertSelectorTextContains('div.alert.alert-danger', 'Merci de vous connecter!');
+
+        $this->assertRouteSame('login');
+    }
+
+
 
     /**
      * Test creating a task
@@ -111,6 +156,25 @@ class TaskControllerTest extends WebTestCase
         $this->assertSelectorTextContains('div.alert.alert-success', 'Votre tâche a bien été ajoutée.');
     }
 
+    /**
+     * Test access create a user task not connected
+     *
+     * @return void
+     */
+    public function testCreateTaskUserNotLoggedIn(): void
+    {
+        $urlGenerator = $this->client->getContainer()->get('router.default');
+        $this->client->request(Request::METHOD_GET, $urlGenerator->generate('task_create'));
+
+        $this->assertTrue($this->client->getResponse()->isRedirect());
+
+        $this->client->followRedirect();
+
+        $this->assertSelectorTextContains('div.alert.alert-danger', 'Merci de vous connecter!');
+
+        $this->assertRouteSame('login');
+    }
+
 
     /**
      * Test updating task
@@ -144,6 +208,53 @@ class TaskControllerTest extends WebTestCase
         $this->assertRouteSame('task_list');
     }
 
+    /**
+     * Access denied test when editing a task
+     *
+     * @return void
+     */
+    public function testAccessDenyEditTask(): void
+    {
+        // User logged in
+        $userRepository = $this->client->getContainer()->get('doctrine.orm.entity_manager')->getRepository(User::class);
+        $otherUser = $userRepository->findOneByUsername("sroussel");
+        $this->client->loginUser($otherUser);
+
+        $currentUser = $this->getUserTest();
+        $taskRepository = $this->client->getContainer()->get('doctrine.orm.entity_manager')->getRepository(Task::class);
+        $task = $taskRepository->findOneBy(['user' => $currentUser]);
+
+        $urlGenerator = $this->client->getContainer()->get('router.default');
+        $this->client->request(Request::METHOD_GET, $urlGenerator->generate('task_edit', ['id' => $task->getId()]));
+
+        $this->assertNotEquals($currentUser, $otherUser);
+        $this->assertResponseStatusCodeSame(Response::HTTP_FORBIDDEN);
+    }
+
+    /**
+     * Test access edit a user task not connected
+     *
+     * @return void
+     */
+    public function testEditTaskUserNotLoggedIn(): void
+    {
+        $currentUser = $this->getUserTest();
+
+        $taskRepository = $this->client->getContainer()->get('doctrine.orm.entity_manager')->getRepository(Task::class);
+        $task = $taskRepository->findOneBy(['user' => $currentUser]);
+
+        $urlGenerator = $this->client->getContainer()->get('router.default');
+        $this->client->request(Request::METHOD_GET, $urlGenerator->generate('task_edit', ['id' => $task->getId()]));
+
+        $this->assertTrue($this->client->getResponse()->isRedirect());
+
+        $this->client->followRedirect();
+
+        $this->assertSelectorTextContains('div.alert.alert-danger', 'Merci de vous connecter!');
+
+        $this->assertRouteSame('login');
+    }
+
 
     /**
      * Test deleting a task
@@ -170,12 +281,93 @@ class TaskControllerTest extends WebTestCase
         $this->assertRouteSame('task_list');
     }
 
+
     /**
-     * Test the change in task status
+     * Access denied test when deleting a task
      *
      * @return void
      */
-    public function testToggleActionSuccessful()
+    public function testAccessDenyDeleteTask(): void
+    {
+        // User logged in
+        $userRepository = $this->client->getContainer()->get('doctrine.orm.entity_manager')->getRepository(User::class);
+        $otherUser = $userRepository->findOneByUsername("sroussel");
+        $this->client->loginUser($otherUser);
+
+        $currentUser = $this->getUserTest();
+
+        $taskRepository = $this->client->getContainer()->get('doctrine.orm.entity_manager')->getRepository(Task::class);
+        $task = $taskRepository->findOneBy(['user' => $currentUser]);
+
+        $urlGenerator = $this->client->getContainer()->get('router.default');
+        $this->client->request(Request::METHOD_GET, $urlGenerator->generate('task_delete', ['id' => $task->getId()]));
+
+        $this->assertNotEquals($currentUser, $otherUser);
+        $this->assertResponseStatusCodeSame(Response::HTTP_FORBIDDEN);
+    }
+
+    /**
+     * Access denied test when deleting an anonymous task by an average user
+     *
+     * @return void
+     */
+    public function testAccessDenyDeleteAnonymousTask(): void
+    {
+        // User logged in
+        $userRepository = $this->client->getContainer()->get('doctrine.orm.entity_manager')->getRepository(User::class);
+        $admin = $userRepository->findOneByUsername("laura");
+        $this->client->loginUser($admin);
+
+        $anonymous = $userRepository->findOneByUsername("anonymous");
+
+        $taskRepository = $this->client->getContainer()->get('doctrine.orm.entity_manager')->getRepository(Task::class);
+        $task = $taskRepository->findOneBy(['user' => $anonymous]);
+
+        $urlGenerator = $this->client->getContainer()->get('router.default');
+        $this->client->request(Request::METHOD_GET, $urlGenerator->generate('task_delete', ['id' => $task->getId()]));
+
+        $this->assertTrue($this->client->getResponse()->isRedirect());
+
+        $this->client->followRedirect();
+
+        $this->assertTrue(in_array('ROLE_ADMIN', $admin->getRoles()));
+
+        $this->assertSelectorTextContains('div.alert.alert-success', 'Superbe ! Votre tâche ' . '"' . $task->getTitle() . '"' . ' a été supprimée.');
+
+        $this->assertRouteSame('task_list');
+    }
+
+    /**
+     * Test access delete a user task not connected
+     *
+     * @return void
+     */
+    public function testDeleteTaskUserNotLoggedIn(): void
+    {
+        $currentUser = $this->getUserTest();
+
+        $taskRepository = $this->client->getContainer()->get('doctrine.orm.entity_manager')->getRepository(Task::class);
+        $task = $taskRepository->findOneBy(['user' => $currentUser]);
+
+        $urlGenerator = $this->client->getContainer()->get('router.default');
+        $this->client->request(Request::METHOD_GET, $urlGenerator->generate('task_delete', ['id' => $task->getId()]));
+
+        $this->assertTrue($this->client->getResponse()->isRedirect());
+
+        $this->client->followRedirect();
+
+        $this->assertSelectorTextContains('div.alert.alert-danger', 'Merci de vous connecter!');
+
+        $this->assertRouteSame('login');
+    }
+
+
+    /**
+     * Test task status change to true
+     *
+     * @return void
+     */
+    public function testToggleActionToTrueSuccessful()
     {
         $currentUser = $this->getUserTest();
         $this->client->loginUser($currentUser);
@@ -187,7 +379,38 @@ class TaskControllerTest extends WebTestCase
         $urlGenerator = $this->client->getContainer()->get('router.default');
         $this->client->request(Request::METHOD_GET, $urlGenerator->generate('task_toggle', ['id' => $task->getId()]));
 
+        $this->assertTrue($this->client->getResponse()->isRedirect());
+        $this->client->followRedirect();
+
+        $this->assertRouteSame('task_list');
+
         $task = $taskRepository->find($task->getId());
         $this->assertFalse($task->isIsDone());
+    }
+
+    /**
+     * Test task status change to false
+     *
+     * @return void
+     */
+    public function testToggleActiontoFalseSuccessful()
+    {
+        $currentUser = $this->getUserTest();
+        $this->client->loginUser($currentUser);
+
+        $taskRepository = $this->client->getContainer()->get('doctrine.orm.entity_manager')->getRepository(Task::class);
+        $task = $taskRepository->findOneBy(['user' => $currentUser]);
+        $task->toggle($task->isIsDone());
+
+        $urlGenerator = $this->client->getContainer()->get('router.default');
+        $this->client->request(Request::METHOD_GET, $urlGenerator->generate('task_toggle', ['id' => $task->getId()]));
+
+        $this->assertTrue($this->client->getResponse()->isRedirect());
+        $this->client->followRedirect();
+
+        $task = $taskRepository->find($task->getId());
+        $this->assertTrue($task->isIsDone());
+
+        $this->assertRouteSame('task_list');
     }
 }

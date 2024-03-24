@@ -37,8 +37,6 @@ class MainControllerTest extends WebTestCase
      */
     public function testConnexionDisplayHomepage(): void
     {
-        // $this->client->request('GET', '/login');
-
         $currentUser = $this->getUserTest();
         $this->client->loginUser($currentUser);
 
@@ -51,7 +49,8 @@ class MainControllerTest extends WebTestCase
         $this->assertResponseStatusCodeSame(Response::HTTP_OK);
 
         $this->assertSelectorTextContains('h1', "Bienvenue sur Todo List, l'application vous permettant de gérer l'ensemble de vos tâches sans effort !");
-        $this->assertSelectorTextContains('a.btn.btn-primary', 'Créer un utilisateur');
+        $this->assertSelectorTextContains('a.btn.btn-warning', 'Accueil');
+        $this->assertSelectorTextContains('a.btn.btn-primary', 'Administration');
         $this->assertSelectorTextContains('a.btn.btn-danger', 'Se déconnecter');
         $this->assertSelectorTextContains('a.btn.btn-success', 'Créer une nouvelle tâche');
         $this->assertSelectorTextContains('a.btn.btn-info', 'Consulter la liste des tâches à faire');

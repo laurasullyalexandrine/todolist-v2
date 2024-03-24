@@ -31,6 +31,29 @@ class UserControllerTest extends WebTestCase
     }
 
     /**
+     * Test access to the administration part
+     *
+     * @return void
+     */
+    public function testAccessDenyReadUsers(): void
+    {
+        $userRepository = $this->client->getContainer()->get('doctrine.orm.entity_manager')->getRepository(User::class);
+        $currentUser = $userRepository->findOneByUsername("qcourtois");
+
+        $currentUser->setRoles(['ROLE_USER']);
+
+        $this->client->loginUser($currentUser);
+
+        $urlGenerator = $this->client->getContainer()->get('router');
+        $this->client->request(Request::METHOD_GET, $urlGenerator->generate('admin_users_list'));
+
+        $this->assertFalse(in_array('ROLE_ADMIN', $currentUser->getRoles()));
+
+        $this->assertResponseStatusCodeSame(Response::HTTP_FORBIDDEN);
+    }
+
+
+    /**
      * Test redirection if admin user not logged in
      *
      * @return void
@@ -70,6 +93,7 @@ class UserControllerTest extends WebTestCase
         $this->assertSelectorNotExists('div.alert.alert-warning', 'Il n\'y a pas encore d\'utilisateur enregistré.');
     }
 
+
     /**
      * Test updating user by an admin
      *
@@ -82,16 +106,16 @@ class UserControllerTest extends WebTestCase
 
         $userRepository = $this->client->getContainer()->get('doctrine.orm.entity_manager')->getRepository(User::class);
 
-        $user = $userRepository->findOneByUsername(['user' => 'emmanuelle38']);
+        $user = $userRepository->findOneByUsername(['user' => 'gerard04']);
 
         $urlGenerator = $this->client->getContainer()->get('router');
-
         $this->client->request(Request::METHOD_POST, $urlGenerator->generate('admin_users_edit', ['id' => $user->getId()]));
+
         $this->assertResponseIsSuccessful();
 
         $this->client->submitForm('Modifier', [
-            'user[username]' => 'emmanuelle38',
-            'user[email]' => 'emmanuelle38@todolist.fr',
+            'user[username]' => 'gerard04',
+            'user[email]' => 'gerard04@todolist.fr',
             'user[password][first]' => 'password_2',
             'user[password][second]' => 'password_2',
         ]);
@@ -107,6 +131,12 @@ class UserControllerTest extends WebTestCase
         $this->assertRouteSame('admin_users_list');
     }
 
+
+    /**
+     * Test checkboxes
+     *
+     * @return void
+     */
     public function testCheckboxRoles(): void
     {
         $currentAdmin = $this->getAdminTest();
@@ -114,7 +144,7 @@ class UserControllerTest extends WebTestCase
 
         $userRepository = $this->client->getContainer()->get('doctrine.orm.entity_manager')->getRepository(User::class);
 
-        $user = $userRepository->findOneByUsername(['user' => 'emmanuelle38']);
+        $user = $userRepository->findOneByUsername(['user' => 'gerard04']);
 
         $urlGenerator = $this->client->getContainer()->get('router');
 
@@ -123,8 +153,8 @@ class UserControllerTest extends WebTestCase
 
         $formData = [
             'user[roles][1]' => 'ROLE_ADMIN',
-            'user[username]' => 'emmanuelle38',
-            'user[email]' => 'emmanuelle38@todolist.fr',
+            'user[username]' => 'gerard04',
+            'user[email]' => 'gerard04@todolist.fr',
             'user[password][first]' => 'password_2',
             'user[password][second]' => 'password_2',
         ];
@@ -145,7 +175,7 @@ class UserControllerTest extends WebTestCase
 
         $this->client->followRedirect();
 
-        $updatedUser = $userRepository->findOneByUsername('emmanuelle38');
+        $updatedUser = $userRepository->findOneByUsername('gerard04');
 
         $this->assertTrue(in_array('ROLE_ADMIN', $updatedUser->getRoles()));
 

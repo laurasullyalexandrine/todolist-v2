@@ -74,7 +74,7 @@ class RegistrationControllerTest extends WebTestCase
      *
      * @return void
      */
-    public function testCreateUser(): void
+    public function testRegisterUser(): void
     {
         $urlGenerator = $this->client->getContainer()->get('router');
 
