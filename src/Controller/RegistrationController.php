@@ -10,18 +10,21 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Security\Http\Authentication\UserAuthenticatorInterface;
+#[IsGranted('ROLE_ADMIN')]
 #[Route('/admin/users', name: 'admin_users_')]
 class RegistrationController extends AbstractController
 {
     #[Route('/register', name: 'register')]
     public function register(Request $request, UserPasswordHasherInterface $userPasswordHasher, UserAuthenticatorInterface $userAuthenticator, LoginFormAuthenticator $authenticator, EntityManagerInterface $entityManager): Response
     {
-        $user = $this->getUser();
-
-        $this->denyAccessUnlessGranted(UserVoter::NEW, $user);
+        if (!$this->getUser()) {
+            $this->addFlash('danger', 'Merci de vous connecter!');
+            return $this->redirectToRoute('login');
+        }
 
         $user = new User();
         $form = $this->createForm(RegistrationFormType::class, $user);

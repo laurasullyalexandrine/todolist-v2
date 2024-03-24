@@ -12,7 +12,9 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
+#[IsGranted('ROLE_ADMIN')]
 #[Route('/admin/users', name: 'admin_users_')]
 class UserController extends AbstractController
 {
@@ -25,7 +27,10 @@ class UserController extends AbstractController
     #[Route('/', name: 'list', methods: ["GET"])]
     public function list(UserRepository $userRepository): Response
     {
-        $this->denyAccessUnlessGranted(UserVoter::READ, $this->getUser());
+        if (!$this->getUser()) {
+            $this->addFlash('danger', 'Merci de vous connecter!');
+            return $this->redirectToRoute('login');
+        }
 
         return $this->render('user/list.html.twig', [
             'users' => $userRepository->findAll(),
@@ -38,8 +43,10 @@ class UserController extends AbstractController
         User $user,
         Request $request
     ) {
-
-        $this->denyAccessUnlessGranted(UserVoter::EDIT, $this->getUser());
+        if (!$this->getUser()) {
+            $this->addFlash('danger', 'Merci de vous connecter!');
+            return $this->redirectToRoute('login');
+        }
 
         $form = $this->createForm(UserType::class, $user);
         $form->handleRequest($request);
