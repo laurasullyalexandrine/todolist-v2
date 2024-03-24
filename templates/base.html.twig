@@ -8,7 +8,7 @@
 		<div class="row">
 			{# if has a user and have admin role #}
 			{% if app.user %}
-				<a href="{{ path('homepage') }}" class="pull-right btn btn-secondary">Accueil</a>
+				<a href="{{ path('homepage') }}" class="pull-right btn btn-warning">Accueil</a>
 				{% if is_granted ("ROLE_ADMIN") %}
 					<a href="{{ path('admin_users_list') }}" class="btn btn-primary">Administration</a>
 				{% endif %}
