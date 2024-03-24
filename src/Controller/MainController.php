@@ -20,7 +20,7 @@ class MainController extends AbstractController
     public function homepage(): Response
     {
         $user = $this->token->getToken()->getUser();
-        $tasks = $this->taskRepository->findAllTaskByUser($user);
+        $tasks = $this->taskRepository->findByIsDoneFalse($user);
         return $this->render('main/homepage.html.twig', [
             'tasks' => $tasks,
         ]);
