@@ -123,14 +123,20 @@ class TaskController extends AbstractController
     public function toggleTask(
         Task $task
     ): Response {
-
         $this->denyAccessUnlessGranted(TaskVoter::EDIT, $task);
+
         $task->toggle(!$task->isIsDone());
+
         $task->setUpdatedAt(new \DateTimeImmutable());
 
         $this->manager->flush();
 
-        $this->addFlash('success', sprintf('La tâche %s a bien été marquée comme faite.', $task->getTitle()));
+        if ($task->isIsDone() === false) {
+            $this->addFlash('success', sprintf('La tâche %s a bien été marquée comme non terminée.', $task->getTitle()));
+        } else {
+            $this->addFlash('success', sprintf('La tâche %s a bien été marquée comme faite.', $task->getTitle()));
+        }
+
         return $this->redirectToRoute('task_list');
     }
 
