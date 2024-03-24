@@ -3,24 +3,26 @@
 <body>
 	{% include "_partial/_nav.html.twig" %}
 
-	<!-- Page Content -->
-	<div class="container">
-		<div class="row">
-			{# if has a user and have admin role #}
-			{% if app.user %}
-				<a href="{{ path('homepage') }}" class="pull-right btn btn-warning">Accueil</a>
-				{% if is_granted ("ROLE_ADMIN") %}
-					<a href="{{ path('admin_users_list') }}" class="btn btn-primary">Administration</a>
+	{% block navigation %}
+		<!-- Page Content -->
+		<div class="container">
+			<div
+				class="row">
+				{# if has a user and have admin role #}
+				{% if app.user %}
+					<a href="{{ path('homepage') }}" class="pull-right btn btn-warning">Accueil</a>
+					{% if is_granted ("ROLE_ADMIN") %}
+						<a href="{{ path('admin_users_list') }}" class="btn btn-primary">Administration</a>
+					{% endif %}
+
+					<a href="{{ path('logout') }}" class="pull-right btn btn-danger">Se déconnecter</a>
 				{% endif %}
 
-				<a href="{{ path('logout') }}" class="pull-right btn btn-danger">Se déconnecter</a>
-			{% endif %}
-
-			{% if not app.user and 'login' != app.request.attributes.get('_route') %}
-				<a href="{{ path('login') }}" class="btn btn-success">Se connecter</a>
-			{% endif %}
-		</div>
-
+				{% if not app.user and 'login' != app.request.attributes.get('_route') %}
+					<a href="{{ path('login') }}" class="btn btn-success">Se connecter</a>
+				{% endif %}
+			</div>
+		{% endblock %}
 		<div class="row">
 			<div class="col-md-12">
 				{% include "_partial/_flash.html.twig" %}
