@@ -31,7 +31,6 @@ class TaskControllerTest extends WebTestCase
         return $currentUser;
     }
 
-
     /**
      * Test redirection if user not logged in
      *
@@ -54,11 +53,11 @@ class TaskControllerTest extends WebTestCase
 
 
     /**
-     * Test access to road with authorization
+     * Test road access to-do list with authorization
      *
      * @return void
      */
-    public function testGetTaskListByUserSuccessful(): void
+    public function testGetTaskListIsDoneFalseByUserSuccessful(): void
     {
         $urlGenerator = $this->client->getContainer()->get('router');
 
@@ -73,6 +72,48 @@ class TaskControllerTest extends WebTestCase
         $this->assertResponseStatusCodeSame(Response::HTTP_OK);
 
         $this->assertRouteSame('task_list');
+    }
+
+
+    /**
+     * Test the road to the tasks to be done
+     *
+     * @return void
+     */
+    public function testGetTaskListIsDoneTrueByUserSuccessful(): void
+    {
+        $urlGenerator = $this->client->getContainer()->get('router');
+
+        $currentUser = $this->getUserTest();
+        $this->client->loginUser($currentUser);
+
+        $urlGenerator = $this->client->getContainer()->get('router.default');
+        $this->client->request(Request::METHOD_GET, $urlGenerator->generate('task_list_is_done'));
+
+        $this->assertResponseIsSuccessful();
+
+        $this->assertResponseStatusCodeSame(Response::HTTP_OK);
+
+        $this->assertRouteSame('task_list_is_done');
+    }
+
+    /**
+     * Test route access list of completed tasks
+     *
+     * @return void
+     */
+    public function testGetTaskListIsDoneTrueByNotLoggedIn(): void
+    {
+        $urlGenerator = $this->client->getContainer()->get('router');
+
+        $urlGenerator = $this->client->getContainer()->get('router.default');
+        $this->client->request(Request::METHOD_GET, $urlGenerator->generate('task_list_is_done'));
+
+        $this->client->followRedirect();
+
+        $this->assertSelectorTextContains('div.alert.alert-danger', 'Merci de vous connecter!');
+
+        $this->assertRouteSame('login');
     }
 
 
@@ -322,11 +363,11 @@ class TaskControllerTest extends WebTestCase
 
 
     /**
-     * Test the change in task status
+     * Test task status change to true
      *
      * @return void
      */
-    public function testToggleActionSuccessful()
+    public function testToggleActionToTrueSuccessful()
     {
         $currentUser = $this->getUserTest();
         $this->client->loginUser($currentUser);
@@ -338,7 +379,38 @@ class TaskControllerTest extends WebTestCase
         $urlGenerator = $this->client->getContainer()->get('router.default');
         $this->client->request(Request::METHOD_GET, $urlGenerator->generate('task_toggle', ['id' => $task->getId()]));
 
+        $this->assertTrue($this->client->getResponse()->isRedirect());
+        $this->client->followRedirect();
+
+        $this->assertRouteSame('task_list');
+
         $task = $taskRepository->find($task->getId());
         $this->assertFalse($task->isIsDone());
+    }
+
+    /**
+     * Test task status change to false
+     *
+     * @return void
+     */
+    public function testToggleActiontoFalseSuccessful()
+    {
+        $currentUser = $this->getUserTest();
+        $this->client->loginUser($currentUser);
+
+        $taskRepository = $this->client->getContainer()->get('doctrine.orm.entity_manager')->getRepository(Task::class);
+        $task = $taskRepository->findOneBy(['user' => $currentUser]);
+        $task->toggle($task->isIsDone());
+
+        $urlGenerator = $this->client->getContainer()->get('router.default');
+        $this->client->request(Request::METHOD_GET, $urlGenerator->generate('task_toggle', ['id' => $task->getId()]));
+
+        $this->assertTrue($this->client->getResponse()->isRedirect());
+        $this->client->followRedirect();
+
+        $task = $taskRepository->find($task->getId());
+        $this->assertTrue($task->isIsDone());
+
+        $this->assertRouteSame('task_list');
     }
 }
