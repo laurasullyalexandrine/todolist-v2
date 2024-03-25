@@ -4,21 +4,19 @@
 	{{ exception.statusCode }}
 {% endblock %}
 
-{% block navigation %}
-{% endblock %}
+{% block navigation %}{% endblock %}
 
-{% block header_img %}
-{% endblock %}
+{% block header_img %}{% endblock %}
 
 {% block body %}
-<div class="d-flex flex-column">
-	<div class="text-center">
-		<img src="{{ asset('img/errors.jpg') }}" alt="error-image">
+	<div class="d-flex flex-column">
+		<div class="text-center">
+			<img src="{{ asset('img/errors.jpg') }}" alt="error-image">
+		</div>
+		<div class="text-center">
+			<p class="fs-1 my-3">{{ exception.statusCode }}</p>
+			<p class="fs-3 my-3">{{ exception.statusText }}</p>
+			<a class="btn btn-primary" href="{{ path('homepage') }}">Retour à l'accueil</a>
+		</div>
 	</div>
-	<div class="text-center">
-		<p class="fs-1 my-3">{{ exception.statusCode }}</p>
-		<p class="fs-3 my-3">{{ exception.statusText }}</p>
-		<a class="btn btn-primary" href="{{ path('homepage') }}">Retour à l'accueil</a>
-	</div>
-</div>
 {% endblock %}
