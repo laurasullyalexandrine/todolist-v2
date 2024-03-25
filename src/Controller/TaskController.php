@@ -8,6 +8,7 @@ use App\Repository\TaskRepository;
 use App\Repository\UserRepository;
 use App\Security\Voter\TaskVoter;
 use App\Security\Voter\UserVoter;
+use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -35,9 +36,38 @@ class TaskController extends AbstractController
         }
 
         $tasks = $this->taskRepository->findByIsDoneFalse($this->getUser());
-        $anonymous = $this->userRepository->findOneByUsername("anonymous");
 
-        $tasksAnonymous = $this->taskRepository->findByIsDoneFalse($anonymous);
+        $tasksAnonymous = [];
+
+        $now = new \DateTimeImmutable();
+
+        foreach ($tasks as $task) {
+            $createdAt = $task->getCreatedAt();
+            $difference = $now->diff($createdAt);
+            $monthsDifference = $difference->format('%m');
+
+            if ($monthsDifference >= 1) {
+                $taskTitle = $task->getTitle();
+                $this->addFlash('warning', 'La tâche créée le ' . $createdAt->format('Y-m-d') . ' à plus d\'un mois! Merci de l\'a traité ou de la supprimer.');
+            }
+        }
+
+        // Task processing only by admin role
+        if ($this->getUser()->getRoles()[0] === "ROLE_ADMIN") {
+            $anonymous = $this->userRepository->findOneByUsername("anonymous");
+            $tasksAnonymous = $this->taskRepository->findByIsDoneFalse($anonymous);
+
+            foreach ($tasksAnonymous as $taskAnonymous) {
+                $createdAt = $taskAnonymous->getCreatedAt();
+                $difference = $now->diff($createdAt);
+                $monthsDifference = $difference->format('%m');
+
+                if ($monthsDifference >= 1) {
+                    $taskTitle = $taskAnonymous->getTitle();
+                    $this->addFlash('danger', 'La tâche ' . $taskTitle . ' créée le ' . $createdAt->format('Y-m-d') . ' à plus d\'un mois! Merci de l\'a traité ou de la supprimer.');
+                }
+            }
+        }
 
         return $this->render('task/list.html.twig', [
             'tasks' => $tasks,

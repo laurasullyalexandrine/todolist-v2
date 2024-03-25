@@ -1,13 +1,14 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-    <div class="row">
-        {{ form_start(form, {'action' : path('task_create'), 'attr': {'novalidate': 'novalidate'}}) }}
-            {{ form_widget(form) }}
+	<div class="row">
+		<p class="my-3">
+			<a href="{{ path('task_list') }}" class="btn btn-primary">Retour à la liste des tâches</a>
+		</p>
+		{{ form_start(form, {'action' : path('task_create'), 'attr': {'novalidate': 'novalidate'}}) }}
+		{{ form_widget(form) }}
 
-            <button type="submit" class="btn btn-success pull-right">Ajouter</button>
-        {{ form_end(form) }}
-
-        <a href="{{ path('task_list') }}" class="btn btn-primary">Retour à la liste des tâches</a>
-    </div>
+		<button type="submit" class="btn btn-success pull-right">Ajouter</button>
+		{{ form_end(form) }}
+	</div>
 {% endblock %}

@@ -97,6 +97,37 @@ class TaskControllerTest extends WebTestCase
         $this->assertRouteSame('task_list_is_done');
     }
 
+    public function testCreatedAtDeadline(): void
+    {
+        $urlGenerator = $this->client->getContainer()->get('router');
+
+        $userRepository = $this->client->getContainer()->get('doctrine.orm.entity_manager')->getRepository(User::class);
+        $currentUser = $userRepository->findOneByUsername("laura");
+        $this->client->loginUser($currentUser);
+
+        $manager = $this->client->getContainer()->get('doctrine.orm.entity_manager');
+
+        $now = new \DateTimeImmutable();
+        $deadline = $now->modify('-1 month');
+        $task = new Task();
+        $task->setTitle('Titre de ma tâche date limite');
+        $task->setContent('Contenu de ma tâche date limite');
+        $task->setIsDone(false);
+        $task->setCreatedAt($deadline);
+        $task->getUser($currentUser);
+
+        $manager->persist($task);
+        $manager->flush();
+
+        $urlGenerator = $this->client->getContainer()->get('router.default');
+        $this->client->request(Request::METHOD_GET, $urlGenerator->generate('task_list'));
+        // dd($this->client->getRequest()->getSession());
+        $taskTitle = $task->getTitle();
+        $createdAt = $task->getCreatedAt();
+
+        $this->assertSelectorTextContains('div.alert.alert-danger', 'La tâche ' . $taskTitle . ' créée le ' . $createdAt->format('Y-m-d') . ' à plus d\'un mois! Merci de l\'a traité ou de la supprimer.');
+    }
+
     /**
      * Test route access list of completed tasks
      *
