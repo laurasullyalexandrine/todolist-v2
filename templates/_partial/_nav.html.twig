@@ -1,9 +1,24 @@
-<nav class="navbar navbar-light navbar-fixed-top" style="background-color: #e3f2fd;" role="navigation">
-	<div class="container">
-		<div class="navbar-header">
-			<a class="navbar-brand" href="#">To Do List app</a>
 
-			<img src="{{ asset('img/Logo_OpenClassrooms.png') }}" alt="OpenClassrooms"/>
+	<nav class="navbar navbar-light navbar-fixed-top" style="background-color: #e3f2fd;" role="navigation">
+		<div class="container">
+			<div class="navbar-header">
+				{% if app.user %}
+					<a class="navbar-brand" href="{{ path('homepage')}}">To Do List app</a>
+				{% else %}
+					<a class="navbar-brand" href="{{ path('login')}}">To Do List app</a>
+				{% endif %}
+				<img src="{{ asset('img/Logo_OpenClassrooms.png') }}" alt="OpenClassrooms"/>
+				{% if app.user %}
+					<a href="{{ path('homepage') }}" class="pull-right btn btn-warning">Accueil</a>
+					{% if is_granted ("ROLE_ADMIN") %}
+						<a href="{{ path('admin_users_list') }}" class="btn btn-primary">Administration</a>
+					{% endif %}
+					<a href="{{ path('logout') }}" class="pull-right btn btn-danger">Se déconnecter</a>
+				{% endif %}
+
+				{% if not app.user and 'login' != app.request.attributes.get('_route') %}
+					<a href="{{ path('login') }}" class="btn btn-success">Se connecter</a>
+				{% endif %}
+			</div>
 		</div>
-	</div>
-</nav>
+	</nav>

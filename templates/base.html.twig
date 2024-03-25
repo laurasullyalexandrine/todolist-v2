@@ -1,42 +1,26 @@
 {% include "_partial/_head.html.twig" %}
 
 <body>
-	{% include "_partial/_nav.html.twig" %}
-
 	{% block navigation %}
+		{% include "_partial/_nav.html.twig" %}
+	{% endblock %}
 		<!-- Page Content -->
 		<div class="container">
-			<div
-				class="row">
-				{# if has a user and have admin role #}
-				{% if app.user %}
-					<a href="{{ path('homepage') }}" class="pull-right btn btn-warning">Accueil</a>
-					{% if is_granted ("ROLE_ADMIN") %}
-						<a href="{{ path('admin_users_list') }}" class="btn btn-primary">Administration</a>
-					{% endif %}
+			<div class="row">
+				<div class="col-md-12">
+					{% include "_partial/_flash.html.twig" %}
 
-					<a href="{{ path('logout') }}" class="pull-right btn btn-danger">Se déconnecter</a>
-				{% endif %}
-
-				{% if not app.user and 'login' != app.request.attributes.get('_route') %}
-					<a href="{{ path('login') }}" class="btn btn-success">Se connecter</a>
-				{% endif %}
+					{% block header_title %}{% endblock %}
+					{% block header_img %}<img class="slide-image" src="{{ asset('img/todolist_homepage.jpg') }}" alt="todo list">
+					{% endblock %}
+				</div>
 			</div>
-		{% endblock %}
-		<div class="row">
-			<div class="col-md-12">
-				{% include "_partial/_flash.html.twig" %}
 
-				{% block header_title %}{% endblock %}
-				{% block header_img %}<img class="slide-image" src="{{ asset('img/todolist_homepage.jpg') }}" alt="todo list">
-				{% endblock %}
-			</div>
-		</div>
+			<br/>
 
-		<br/>
-
-		<div class="row">
-			<div class="col-md-12"> {% block body %}{% endblock %}
+			<div class="row">
+				<div class="col-md-12"> 
+					{% block body %}{% endblock %}
 				</div>
 			</div>
 		</div>
