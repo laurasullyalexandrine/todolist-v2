@@ -59,8 +59,6 @@ class TaskControllerTest extends WebTestCase
      */
     public function testGetTaskListIsDoneFalseByUserSuccessful(): void
     {
-        $urlGenerator = $this->client->getContainer()->get('router');
-
         $currentUser = $this->getUserTest();
         $this->client->loginUser($currentUser);
 
@@ -82,8 +80,6 @@ class TaskControllerTest extends WebTestCase
      */
     public function testGetTaskListIsDoneTrueByUserSuccessful(): void
     {
-        $urlGenerator = $this->client->getContainer()->get('router');
-
         $currentUser = $this->getUserTest();
         $this->client->loginUser($currentUser);
 
@@ -97,10 +93,15 @@ class TaskControllerTest extends WebTestCase
         $this->assertRouteSame('task_list_is_done');
     }
 
-    public function testCreatedAtDeadline(): void
-    {
-        $urlGenerator = $this->client->getContainer()->get('router');
 
+
+    /**
+     * Test the deadline of a task 
+     *
+     * @return void
+     */
+    public function testCreatedAtDeadlineUser(): void
+    {
         $userRepository = $this->client->getContainer()->get('doctrine.orm.entity_manager')->getRepository(User::class);
         $currentUser = $userRepository->findOneByUsername("laura");
         $this->client->loginUser($currentUser);
@@ -108,10 +109,10 @@ class TaskControllerTest extends WebTestCase
         $manager = $this->client->getContainer()->get('doctrine.orm.entity_manager');
 
         $now = new \DateTimeImmutable();
-        $deadline = $now->modify('-1 month');
+        $deadline = $now->modify('-30 days');
         $task = new Task();
-        $task->setTitle('Titre de ma tâche date limite');
-        $task->setContent('Contenu de ma tâche date limite');
+        $task->setTitle('Tâche administration 1');
+        $task->setContent('Contenu pour les tâches d\'administration 1');
         $task->setIsDone(false);
         $task->setCreatedAt($deadline);
         $task->getUser($currentUser);
@@ -121,12 +122,51 @@ class TaskControllerTest extends WebTestCase
 
         $urlGenerator = $this->client->getContainer()->get('router.default');
         $this->client->request(Request::METHOD_GET, $urlGenerator->generate('task_list'));
-        // dd($this->client->getRequest()->getSession());
+
         $taskTitle = $task->getTitle();
         $createdAt = $task->getCreatedAt();
 
-        $this->assertSelectorTextContains('div.alert.alert-danger', 'La tâche ' . $taskTitle . ' créée le ' . $createdAt->format('Y-m-d') . ' à plus d\'un mois! Merci de l\'a traité ou de la supprimer.');
+        $this->assertSelectorTextContains('div.alert.alert-danger', 'Oops ! La tâche ' . $taskTitle . ' créée le ' . $createdAt->format('Y-m-d') . ' à plus d\'un mois! Merci de l\'a traité ou de la supprimer.');
+
+        $this->assertRouteSame('task_list');
     }
+
+    /**
+     * Test the deadline of a task 
+     *
+     * @return void
+     */
+    public function testCreatedAtDeadlineAdmin(): void
+    {
+        $userRepository = $this->client->getContainer()->get('doctrine.orm.entity_manager')->getRepository(User::class);
+        $currentUser = $userRepository->findOneByUsername("anonymous");
+        $this->client->loginUser($currentUser);
+
+        $manager = $this->client->getContainer()->get('doctrine.orm.entity_manager');
+
+        $now = new \DateTimeImmutable();
+        $deadline = $now->modify('-30 days');
+        $task = new Task();
+        $task->setTitle('Tâche anonyme 1');
+        $task->setContent('Contenu de ma tâche date limite ');
+        $task->setIsDone(false);
+        $task->setCreatedAt($deadline);
+        $task->getUser($currentUser);
+
+        $manager->persist($task);
+        $manager->flush();
+
+        $urlGenerator = $this->client->getContainer()->get('router.default');
+        $this->client->request(Request::METHOD_GET, $urlGenerator->generate('task_list'));
+
+        $taskTitle = $task->getTitle();
+        $createdAt = $task->getCreatedAt();
+
+        $this->assertSelectorTextContains('div.alert.alert-danger', 'Oops ! La tâche ' . $taskTitle . ' créée le ' . $createdAt->format('Y-m-d') . ' à plus d\'un mois! Merci de l\'a traité ou de la supprimer.');
+
+        $this->assertRouteSame('task_list');
+    }
+
 
     /**
      * Test route access list of completed tasks
@@ -244,7 +284,7 @@ class TaskControllerTest extends WebTestCase
      *
      * @return void
      */
-    public function testAccessDenyEditTask(): void
+    public function testAccessDenyEditTaskByUser(): void
     {
         // User logged in
         $userRepository = $this->client->getContainer()->get('doctrine.orm.entity_manager')->getRepository(User::class);
@@ -260,6 +300,44 @@ class TaskControllerTest extends WebTestCase
 
         $this->assertNotEquals($currentUser, $otherUser);
         $this->assertResponseStatusCodeSame(Response::HTTP_FORBIDDEN);
+    }
+
+    /**
+     * Access denied test when editing a task
+     *
+     * @return void
+     */
+    public function testAccessDenyEditAnonymousTask(): void
+    {
+        // User logged in
+        $userRepository = $this->client->getContainer()->get('doctrine.orm.entity_manager')->getRepository(User::class);
+        $admin = $userRepository->findOneByUsername("laura");
+        $this->client->loginUser($admin);
+
+        $anonymous = $userRepository->findOneByUsername("anonymous");
+
+        $taskRepository = $this->client->getContainer()->get('doctrine.orm.entity_manager')->getRepository(Task::class);
+        $task = $taskRepository->findOneBy(['user' => $anonymous]);
+
+        $urlGenerator = $this->client->getContainer()->get('router.default');
+        $this->client->request(Request::METHOD_GET, $urlGenerator->generate('task_edit', ['id' => $task->getId()]));
+
+        $this->assertResponseIsSuccessful();
+
+        $this->client->submitForm('Modifier', [
+            'task[title]' => $task->getTitle(),
+            'task[content]' => $task->setContent('Contenu de la tâche anonymes 2'),
+        ]);
+
+        $this->assertTrue($this->client->getResponse()->isRedirect());
+
+        $this->client->followRedirect();
+
+        $this->assertTrue(in_array('ROLE_ADMIN', $admin->getRoles()));
+
+        $this->assertSelectorTextContains('div.alert.alert-success', 'Superbe ! Votre tâche a bien été modifiée.');
+
+        $this->assertRouteSame('task_list');
     }
 
     /**

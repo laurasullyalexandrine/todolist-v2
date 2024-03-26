@@ -37,7 +37,7 @@ class TaskController extends AbstractController
 
         $tasks = $this->taskRepository->findByIsDoneFalse($this->getUser());
 
-        $tasksAnonymous = [];
+
 
         $now = new \DateTimeImmutable();
 
@@ -48,10 +48,11 @@ class TaskController extends AbstractController
 
             if ($monthsDifference >= 1) {
                 $taskTitle = $task->getTitle();
-                $this->addFlash('warning', 'La tâche créée le ' . $createdAt->format('Y-m-d') . ' à plus d\'un mois! Merci de l\'a traité ou de la supprimer.');
+                $this->addFlash('danger', 'La tâche ' . $taskTitle . ' créée le ' . $createdAt->format('Y-m-d') . ' à plus d\'un mois! Merci de l\'a traité ou de la supprimer.');
             }
         }
 
+        $tasksAnonymous = [];
         // Task processing only by admin role
         if ($this->getUser()->getRoles()[0] === "ROLE_ADMIN") {
             $anonymous = $this->userRepository->findOneByUsername("anonymous");
@@ -74,6 +75,7 @@ class TaskController extends AbstractController
             'tasksAnonymous' => $tasksAnonymous,
         ]);
     }
+
 
     #[Route('/list-is-done', name: 'list_is_done')]
     public function listIsDone(): Response
@@ -135,6 +137,8 @@ class TaskController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $task->setUpdatedAt(new \DateTimeImmutable());
+
             $this->manager->persist($task);
             $this->manager->flush();
 
