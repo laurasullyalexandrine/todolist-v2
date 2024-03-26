@@ -33,8 +33,7 @@ class TaskRepository extends ServiceEntityRepository
             ->setParameter('isDone', false)
             ->orderBy('t.created_at', 'DESC')
             ->getQuery()
-            ->getResult()
-            ;
+            ->getResult();
     }
 
     public function findByIsDoneTrue(User $user): array
@@ -48,7 +47,6 @@ class TaskRepository extends ServiceEntityRepository
             ->setParameter('isDone', true)
             ->orderBy('t.created_at', 'DESC')
             ->getQuery()
-            ->getResult()
-            ;
+            ->getResult();
     }
 }
