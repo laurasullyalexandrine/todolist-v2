@@ -37,7 +37,7 @@ class UserController extends AbstractController
     public function edit(
         User $user,
         Request $request
-    ) {
+    ): Response {
         $form = $this->createForm(UserType::class, $user);
         $form->handleRequest($request);
 

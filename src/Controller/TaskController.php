@@ -176,7 +176,7 @@ class TaskController extends AbstractController
     #[Route('/{id}/delete', name: 'delete', methods: ["GET", "POST"])]
     public function deleteTask(
         Task $task
-    ) {
+    ): Response {
 
         if (!$this->getUser()) {
             $this->addFlash('danger', 'Merci de vous connecter!');
