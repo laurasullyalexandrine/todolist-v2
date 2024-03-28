@@ -27,7 +27,7 @@ class TaskController extends AbstractController
     ) {
     }
 
-    #[Route('/', name: 'list')]
+    #[Route('/', name: 'list', methods:['GET'])]
     public function list(): Response
     {
         if (!$this->getUser()) {
@@ -36,8 +36,6 @@ class TaskController extends AbstractController
         }
 
         $tasks = $this->taskRepository->findByIsDoneFalse($this->getUser());
-
-
 
         $now = new \DateTimeImmutable();
 
@@ -77,7 +75,7 @@ class TaskController extends AbstractController
     }
 
 
-    #[Route('/list-is-done', name: 'list_is_done')]
+    #[Route('/list-is-done', name: 'list_is_done', methods:['GET'])]
     public function listIsDone(): Response
     {
         if (!$this->getUser()) {
