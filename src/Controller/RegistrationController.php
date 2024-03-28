@@ -19,7 +19,7 @@ use Symfony\Component\Security\Http\Authentication\UserAuthenticatorInterface;
 #[Route('/admin/users', name: 'admin_users_')]
 class RegistrationController extends AbstractController
 {
-    #[Route('/register', name: 'register')]
+    #[Route('/register', name: 'register', methods:['GET', 'POST'])]
     public function register(Request $request, UserPasswordHasherInterface $userPasswordHasher, UserAuthenticatorInterface $userAuthenticator, LoginFormAuthenticator $authenticator, EntityManagerInterface $entityManager): Response
     {
         $user = new User();

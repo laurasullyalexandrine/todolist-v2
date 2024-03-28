@@ -16,7 +16,7 @@ class MainController extends AbstractController
     ) {
     }
 
-    #[Route('/homepage', name: 'homepage')]
+    #[Route('/homepage', name: 'homepage', methods:['GET'])]
     public function homepage(): Response
     {
         $user = $this->token->getToken()->getUser();
