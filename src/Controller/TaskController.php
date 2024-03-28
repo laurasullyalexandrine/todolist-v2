@@ -52,7 +52,7 @@ class TaskController extends AbstractController
 
         $tasksAnonymous = [];
         // Task processing only by admin role
-        if ($this->getUser()->getRoles()[0] === "ROLE_ADMIN") {
+        if (isset($this->getUser()->getRoles()[0]) && $this->getUser()->getRoles()[0] === "ROLE_ADMIN") {
             $anonymous = $this->userRepository->findOneByUsername("anonymous");
             $tasksAnonymous = $this->taskRepository->findByIsDoneFalse($anonymous);
 
