@@ -26,7 +26,7 @@ class TaskControllerTest extends WebTestCase
     public function getUserTest(): User
     {
         $userRepository = $this->client->getContainer()->get('doctrine.orm.entity_manager')->getRepository(User::class);
-        $currentUser = $userRepository->findOneByUsername("arenard");
+        $currentUser = $userRepository->findOneByUsername("guy81");
 
         return $currentUser;
     }
@@ -109,10 +109,10 @@ class TaskControllerTest extends WebTestCase
         $manager = $this->client->getContainer()->get('doctrine.orm.entity_manager');
 
         $now = new \DateTimeImmutable();
-        $deadline = $now->modify('-30 days');
+        $deadline = $now->sub(new \DateInterval('P29D'));
         $task = new Task();
-        $task->setTitle('Tâche administration 1');
-        $task->setContent('Contenu pour les tâches d\'administration 1');
+        $task->setTitle('Tâche administration n° 1');
+        $task->setContent('Contenu de la tâche d\'administration n° 1');
         $task->setIsDone(false);
         $task->setCreatedAt($deadline);
         $task->getUser($currentUser);
@@ -126,11 +126,12 @@ class TaskControllerTest extends WebTestCase
         $taskTitle = $task->getTitle();
         $createdAt = $task->getCreatedAt();
 
-        $this->assertSelectorTextContains('div.alert.alert-danger', 'Oops ! La tâche ' . $taskTitle . ' créée le ' . $createdAt->format('Y-m-d') . ' à plus d\'un mois! Merci de l\'a traité ou de la supprimer.');
+        $this->assertSelectorTextContains('div.alert.alert-danger', 'Oops ! La tâche ' . $taskTitle . ' créée le ' . $createdAt->format('d-m-Y') . ' a plus d\'un mois! Merci de l\'a traitée ou de la supprimer.');
 
         $this->assertRouteSame('task_list');
     }
 
+    // lors du debug des variables $deadline et $task la date 
     /**
      * Test the deadline of a task 
      *
@@ -145,10 +146,10 @@ class TaskControllerTest extends WebTestCase
         $manager = $this->client->getContainer()->get('doctrine.orm.entity_manager');
 
         $now = new \DateTimeImmutable();
-        $deadline = $now->modify('-30 days');
+        $deadline = $now->sub(new \DateInterval('P29D'));
         $task = new Task();
-        $task->setTitle('Tâche anonyme 1');
-        $task->setContent('Contenu de ma tâche date limite ');
+        $task->setTitle('Tâche anonyme n° 1');
+        $task->setContent('Contenu de la tâche anonyme n° 1');
         $task->setIsDone(false);
         $task->setCreatedAt($deadline);
         $task->getUser($currentUser);
@@ -162,7 +163,7 @@ class TaskControllerTest extends WebTestCase
         $taskTitle = $task->getTitle();
         $createdAt = $task->getCreatedAt();
 
-        $this->assertSelectorTextContains('div.alert.alert-danger', 'Oops ! La tâche ' . $taskTitle . ' créée le ' . $createdAt->format('Y-m-d') . ' à plus d\'un mois! Merci de l\'a traité ou de la supprimer.');
+        $this->assertSelectorTextContains('div.alert.alert-danger', 'Oops ! La tâche ' . $taskTitle . ' créée le ' . $createdAt->format('d-m-Y') . ' a plus d\'un mois! Merci de l\'a traitée ou de la supprimer.');
 
         $this->assertRouteSame('task_list');
     }
@@ -206,8 +207,8 @@ class TaskControllerTest extends WebTestCase
 
         $task = new Task();
         $this->client->submitForm('Ajouter', [
-            'task[title]' => $task->setTitle('Titre de ma nouvelle tâche 1'),
-            'task[content]' => $task->setContent('Contenu de ma nouvelle tâche 1'),
+            'task[title]' => $task->setTitle('Ma nouvelle tâche n° 1'),
+            'task[content]' => $task->setContent('Contenu de ma nouvelle tâche n° 1'),
         ]);
 
         $this->assertNotEmpty($task->getTitle());
@@ -266,8 +267,8 @@ class TaskControllerTest extends WebTestCase
         $this->assertResponseIsSuccessful();
 
         $this->client->submitForm('Modifier', [
-            'task[title]' => $task->setTitle('Titre modifié de ma tâche 1'),
-            'task[content]' => $task->setContent('Contenu modifié de ma tâche 1'),
+            'task[title]' => $task->setTitle('Ma tâche modifiée n° 1'),
+            'task[content]' => $task->setContent('Contenu de ma tâche modifiée n° 1'),
         ]);
 
         $this->assertTrue($this->client->getResponse()->isRedirect());
@@ -288,7 +289,7 @@ class TaskControllerTest extends WebTestCase
     {
         // User logged in
         $userRepository = $this->client->getContainer()->get('doctrine.orm.entity_manager')->getRepository(User::class);
-        $otherUser = $userRepository->findOneByUsername("sroussel");
+        $otherUser = $userRepository->findOneByUsername("alexandria56");
         $this->client->loginUser($otherUser);
 
         $currentUser = $this->getUserTest();
@@ -326,7 +327,7 @@ class TaskControllerTest extends WebTestCase
 
         $this->client->submitForm('Modifier', [
             'task[title]' => $task->getTitle(),
-            'task[content]' => $task->setContent('Contenu de la tâche anonymes 2'),
+            'task[content]' => $task->setContent('Contenu de la tâche anonyme n° 2'),
         ]);
 
         $this->assertTrue($this->client->getResponse()->isRedirect());
@@ -400,7 +401,7 @@ class TaskControllerTest extends WebTestCase
     {
         // User logged in
         $userRepository = $this->client->getContainer()->get('doctrine.orm.entity_manager')->getRepository(User::class);
-        $otherUser = $userRepository->findOneByUsername("sroussel");
+        $otherUser = $userRepository->findOneByUsername("alexandria56");
         $this->client->loginUser($otherUser);
 
         $currentUser = $this->getUserTest();

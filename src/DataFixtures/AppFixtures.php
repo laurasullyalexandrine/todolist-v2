@@ -38,8 +38,8 @@ class AppFixtures extends Fixture
         // current tasks
         for ($t = 1; $t <= 5; $t++) {
             $taskAdmin = new Task();
-            $taskAdmin->setTitle('Tâche administration ' . $t)
-                ->setContent('Contenu pour les tâches d\'administration ' . $t)
+            $taskAdmin->setTitle('Tâche administration n° ' . $t)
+                ->setContent('Contenu de la tâche d\'administration n° ' . $t)
                 ->setIsDone(false)
                 ->setCreatedAt(new \DateTimeImmutable());
 
@@ -51,8 +51,8 @@ class AppFixtures extends Fixture
         // tasks is done
         for ($t = 1; $t <= 4; $t++) {
             $taskAdmin = new Task();
-            $taskAdmin->setTitle('Tâche administration terminée' . $t)
-                ->setContent('Contenu pour les tâches d\'administration terminée' . $t)
+            $taskAdmin->setTitle('Tâche administration terminée n° ' . $t)
+                ->setContent('Contenu de la tâche d\'administration terminée n° ' . $t)
                 ->setIsDone(true)
                 ->setCreatedAt(new \DateTimeImmutable());
 
@@ -79,8 +79,8 @@ class AppFixtures extends Fixture
         // current tasks
         for ($t = 1; $t <= 8; $t++) {
             $taskAnonymous = new Task();
-            $taskAnonymous->setTitle('Tâche anonyme ' . $t)
-                ->setContent('Contenu pour les tâches anonymes ' . $t)
+            $taskAnonymous->setTitle('Tâche anonyme n° ' . $t)
+                ->setContent('Contenu de la tâche anonyme n° ' . $t)
                 ->setIsDone(false)
                 ->setCreatedAt(new \DateTimeImmutable());
 
@@ -92,8 +92,8 @@ class AppFixtures extends Fixture
         // tasks is done
         for ($t = 1; $t <= 6; $t++) {
             $taskAnonymous = new Task();
-            $taskAnonymous->setTitle('Tâche anonyme ' . $t)
-                ->setContent('Contenu pour les tâches anonymes ' . $t)
+            $taskAnonymous->setTitle('Tâche anonyme terminée n° ' . $t)
+                ->setContent('Contenu de la tâche anonyme terminée n° ' . $t)
                 ->setIsDone(true)
                 ->setCreatedAt(new \DateTimeImmutable());
 
@@ -122,8 +122,8 @@ class AppFixtures extends Fixture
             // current tasks
             for ($t = 1; $t <= 10; $t++) {
                 $task = new Task();
-                $task->setTitle('Tâche utilisateur' . $t)
-                    ->setContent('Contenu pour les tâches des utilisateurs' . $t)
+                $task->setTitle('Tâche n° ' . $t . ' de ' . $user->getUsername())
+                    ->setContent('Contenu de la tâche n° ' . $t . ' de ' . $user->getUsername())
                     ->setIsDone(false)
                     ->setCreatedAt(new \DateTimeImmutable());
 
@@ -135,8 +135,8 @@ class AppFixtures extends Fixture
             // tasks is done
             for ($t = 1; $t <= 12; $t++) {
                 $task = new Task();
-                $task->setTitle('Tâche utilisateur' . $t)
-                    ->setContent('Contenu pour les tâches des utilisateurs' . $t)
+                $task->setTitle('Tâche terminée n° ' . $t . ' de ' . $user->getUsername())
+                    ->setContent('Contenu de la tâche terminée n° ' . $t . ' de ' . $user->getUsername())
                     ->setIsDone(false)
                     ->setCreatedAt(new \DateTimeImmutable());
 
