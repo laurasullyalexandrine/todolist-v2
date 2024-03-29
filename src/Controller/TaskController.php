@@ -27,7 +27,7 @@ class TaskController extends AbstractController
     ) {
     }
 
-    #[Route('/', name: 'list', methods:['GET'])]
+    #[Route('/', name: 'list', methods: ['GET'])]
     public function list(): Response
     {
         if (!$this->getUser()) {
@@ -41,12 +41,13 @@ class TaskController extends AbstractController
 
         foreach ($tasks as $task) {
             $createdAt = $task->getCreatedAt();
+            // dump($createdAt, 123);
             $difference = $now->diff($createdAt);
             $monthsDifference = $difference->format('%m');
 
             if ($monthsDifference >= 1) {
                 $taskTitle = $task->getTitle();
-                $this->addFlash('danger', 'La tâche ' . $taskTitle . ' créée le ' . $createdAt->format('Y-m-d') . ' à plus d\'un mois! Merci de l\'a traité ou de la supprimer.');
+                $this->addFlash('danger', 'La tâche ' . $taskTitle . ' créée le ' . $createdAt->format('d-m-Y') . ' a plus d\'un mois! Merci de l\'a traitée ou de la supprimer.');
             }
         }
 
@@ -58,12 +59,13 @@ class TaskController extends AbstractController
 
             foreach ($tasksAnonymous as $taskAnonymous) {
                 $createdAt = $taskAnonymous->getCreatedAt();
+
                 $difference = $now->diff($createdAt);
                 $monthsDifference = $difference->format('%m');
 
                 if ($monthsDifference >= 1) {
                     $taskTitle = $taskAnonymous->getTitle();
-                    $this->addFlash('danger', 'La tâche ' . $taskTitle . ' créée le ' . $createdAt->format('Y-m-d') . ' à plus d\'un mois! Merci de l\'a traité ou de la supprimer.');
+                    $this->addFlash('danger', 'La tâche ' . $taskTitle . ' créée le ' . $createdAt->format('d-m-Y') . ' a plus d\'un mois! Merci de l\'a traitée ou de la supprimer.');
                 }
             }
         }
@@ -75,7 +77,7 @@ class TaskController extends AbstractController
     }
 
 
-    #[Route('/list-is-done', name: 'list_is_done', methods:['GET'])]
+    #[Route('/list-is-done', name: 'list_is_done', methods: ['GET'])]
     public function listIsDone(): Response
     {
         if (!$this->getUser()) {
