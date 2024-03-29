@@ -11,7 +11,6 @@
 {% block header_img %}{% endblock %}
 
 {% block body %}
-
 	<div class="row">
 		{{ form_start(form, {'action' : path('admin_users_edit', {'id' : user.id})}) }}
 		{{ form_widget(form) }}
