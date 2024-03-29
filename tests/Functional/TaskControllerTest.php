@@ -110,7 +110,6 @@ class TaskControllerTest extends WebTestCase
 
         $now = new \DateTimeImmutable();
         $deadline = $now->sub(new \DateInterval('P29D'));
-        // dump($deadline, 124);
         $task = new Task();
         $task->setTitle('Tâche administration n° 1');
         $task->setContent('Contenu de la tâche d\'administration n° 1');
@@ -120,7 +119,7 @@ class TaskControllerTest extends WebTestCase
 
         $manager->persist($task);
         $manager->flush();
-        // dd($task, 125);
+
         $urlGenerator = $this->client->getContainer()->get('router.default');
         $this->client->request(Request::METHOD_GET, $urlGenerator->generate('task_list'));
 

@@ -41,7 +41,6 @@ class TaskController extends AbstractController
 
         foreach ($tasks as $task) {
             $createdAt = $task->getCreatedAt();
-            // dump($createdAt, 123);
             $difference = $now->diff($createdAt);
             $monthsDifference = $difference->format('%m');
 
