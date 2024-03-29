@@ -5,7 +5,10 @@
 {% endblock %}
 
 {% block body %}
-	<a href="{{ path('task_create') }}" class="btn btn-info pull-right my-3">Créer une tâche</a>
+	<div>
+		<a href="{{ path('task_create') }}" class="btn btn-info pull-right my-3">Créer une tâche</a>
+		<a href="{{ path('task_list_is_done') }}" class="btn btn-secondary pull-right my-3">Liste des tâches terminées</a>
+	</div>
 	<h1>Tâches à faire</h1>
 	<div class="row">
 		{% for task in tasks %}
@@ -45,13 +48,13 @@
 		{% endfor %}
 	</div>
 
-<br>
+	<br>
 
-    {# Management of anonymous tasks by the admin #}
+	{# Management of anonymous tasks by the admin #}
 	{% if is_granted ("ROLE_ADMIN") %}
-    <hr>
+		<hr>
 		<div class="row my-3">
-		<h2 class="my-3">Tâches anonymes à faire</h2>
+			<h2 class="my-3">Tâches anonymes à faire</h2>
 			{% for task in tasksAnonymous %}
 				<div class="col-sm-4 col-lg-4 col-md-4">
 					<div class="thumbnail">
@@ -72,7 +75,7 @@
 							<form action="{{ path('task_toggle', {'id' : task.id }) }}">
 								<button class="btn btn-success btn-sm pull-right me-2">
 									{% if not task.isDone %}
-                                        Marquer comme faite{% else %}Marquer non terminée
+										Marquer comme faite{% else %}Marquer non terminée
 									{% endif %}
 								</button>
 							</form>

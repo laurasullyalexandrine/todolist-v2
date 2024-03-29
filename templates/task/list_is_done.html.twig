@@ -5,7 +5,10 @@
 {% endblock %}
 
 {% block body %}
-	<a href="{{ path('task_create') }}" class="btn btn-info pull-right my-3">Créer une tâche</a>
+	<div>
+		<a href="{{ path('task_create') }}" class="btn btn-info pull-right my-3">Créer une tâche</a>
+		<a href="{{ path('task_list_is_done') }}" class="btn btn-info pull-right my-3">Liste des tâches à faire</a>
+	</div>
 	<h1>Tâches terminées</h1>
 	<div class="row">
 		{% for task in tasks %}
