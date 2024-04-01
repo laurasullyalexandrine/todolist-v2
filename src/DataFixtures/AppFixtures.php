@@ -22,6 +22,10 @@ class AppFixtures extends Fixture
     {
         $faker = Factory::create('fr_FR');
 
+        // tasks lasting more than a month
+        $now = new \DateTimeImmutable();
+        $oneMonthAgo = $now->sub(new \DateInterval('P1M'));
+
         // Administrator
         $admin = new User();
         $admin->setUsername('laura')
@@ -35,8 +39,19 @@ class AppFixtures extends Fixture
             )
             ->setCreatedAt(new \DateTimeImmutable());
 
+        // current task one month ago
+        $taskAdminOneMonthAgo = new Task();
+        $taskAdminOneMonthAgo->setTitle('Tâche administration n° 1')
+            ->setContent('Contenu de la tâche d\'administration n° 1')
+            ->setIsDone(false)
+            ->setCreatedAt($oneMonthAgo);
+
+        $admin->addTask($taskAdminOneMonthAgo);
+
+        $manager->persist($taskAdminOneMonthAgo);
+
         // current tasks
-        for ($t = 1; $t <= 5; $t++) {
+        for ($t = 2; $t <= 5; $t++) {
             $taskAdmin = new Task();
             $taskAdmin->setTitle('Tâche administration n° ' . $t)
                 ->setContent('Contenu de la tâche d\'administration n° ' . $t)
@@ -76,8 +91,20 @@ class AppFixtures extends Fixture
             )
             ->setCreatedAt(new \DateTimeImmutable());
 
+
+        // current task one month ago
+        $taskAdminOneMonthAgo = new Task();
+        $taskAdminOneMonthAgo->setTitle('Tâche anonyme n° 1')
+            ->setContent('Contenu de la tâche anonyme n° 1')
+            ->setIsDone(false)
+            ->setCreatedAt($oneMonthAgo);
+
+        $anonymous->addTask($taskAdminOneMonthAgo);
+
+        $manager->persist($taskAdminOneMonthAgo);
+
         // current tasks
-        for ($t = 1; $t <= 8; $t++) {
+        for ($t = 2; $t <= 8; $t++) {
             $taskAnonymous = new Task();
             $taskAnonymous->setTitle('Tâche anonyme n° ' . $t)
                 ->setContent('Contenu de la tâche anonyme n° ' . $t)
@@ -118,10 +145,7 @@ class AppFixtures extends Fixture
             )
             ->setCreatedAt(new \DateTimeImmutable());
 
-        // tasks lasting more than a month
-        $now = new \DateTimeImmutable();
-        $oneMonthAgo = $now->sub(new \DateInterval('P1M'));
-        
+        // current tasks one month ago
         for ($t = 1; $t <= 2; $t++) {
             $taskPaul = new Task();
             $taskPaul->setTitle('Tâche à faire n° ' . $t)
