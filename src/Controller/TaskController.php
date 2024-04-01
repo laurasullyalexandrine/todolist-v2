@@ -3,16 +3,15 @@
 namespace App\Controller;
 
 use App\Entity\Task;
+use App\Entity\User;
 use App\Form\TaskType;
+use App\Security\Voter\TaskVoter;
 use App\Repository\TaskRepository;
 use App\Repository\UserRepository;
-use App\Security\Voter\TaskVoter;
-use App\Security\Voter\UserVoter;
-use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Annotation\Route;;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
@@ -177,16 +176,19 @@ class TaskController extends AbstractController
     #[Route('/{id}/delete', name: 'delete', methods: ["GET", "POST"])]
     public function deleteTask(
         Task $task
-    ): Response {
+    ): mixed {
 
-        if (!$this->getUser()) {
+        $user = $this->getUser();
+        if (!$user instanceof User) {
+
             $this->addFlash('danger', 'Merci de vous connecter!');
             return $this->redirectToRoute('login');
         }
 
-        $this->denyAccessUnlessGranted(TaskVoter::DELETE, $task);
 
-        $this->manager->remove($task);
+        $this->denyAccessUnlessGranted(TaskVoter::DELETE, $task);
+        $user->removeTask($task);
+
         $this->manager->flush();
 
         $this->addFlash('success', 'Votre tâche ' . '"' . $task->getTitle() . '"' . ' a été supprimée.');

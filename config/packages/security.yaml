@@ -41,8 +41,8 @@ security:
         - { path: ^/admin, roles: ROLE_ADMIN }
 
     role_hierarchy:
-        ROLE_ANONYMUS: ROLE_USER
-        ROLE_ADMIN: ROLE_ANONYMUS
+        ROLE_ANONYMOUS: ROLE_USER
+        ROLE_ADMIN: ROLE_ANONYMOUS
 
 when@test:
     security:

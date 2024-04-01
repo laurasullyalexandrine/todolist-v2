@@ -26,7 +26,7 @@ class TaskControllerTest extends WebTestCase
     public function getUserTest(): User
     {
         $userRepository = $this->client->getContainer()->get('doctrine.orm.entity_manager')->getRepository(User::class);
-        $currentUser = $userRepository->findOneByUsername("guy81");
+        $currentUser = $userRepository->findOneByUsername("paul");
 
         return $currentUser;
     }
@@ -109,13 +109,13 @@ class TaskControllerTest extends WebTestCase
         $manager = $this->client->getContainer()->get('doctrine.orm.entity_manager');
 
         $now = new \DateTimeImmutable();
-        $deadline = $now->sub(new \DateInterval('P29D'));
+        $oneMonthAgo = $now->sub(new \DateInterval('P1M'));
+
         $task = new Task();
         $task->setTitle('Tâche administration n° 1');
         $task->setContent('Contenu de la tâche d\'administration n° 1');
         $task->setIsDone(false);
-        $task->setCreatedAt($deadline);
-        $task->getUser($currentUser);
+        $task->setCreatedAt($oneMonthAgo);
 
         $manager->persist($task);
         $manager->flush();
@@ -131,7 +131,7 @@ class TaskControllerTest extends WebTestCase
         $this->assertRouteSame('task_list');
     }
 
-    // lors du debug des variables $deadline et $task la date 
+
     /**
      * Test the deadline of a task 
      *
@@ -146,13 +146,13 @@ class TaskControllerTest extends WebTestCase
         $manager = $this->client->getContainer()->get('doctrine.orm.entity_manager');
 
         $now = new \DateTimeImmutable();
-        $deadline = $now->sub(new \DateInterval('P29D'));
+        $oneMonthAgo = $now->sub(new \DateInterval('P1M'));
+
         $task = new Task();
         $task->setTitle('Tâche anonyme n° 1');
         $task->setContent('Contenu de la tâche anonyme n° 1');
         $task->setIsDone(false);
-        $task->setCreatedAt($deadline);
-        $task->getUser($currentUser);
+        $task->setCreatedAt($oneMonthAgo);
 
         $manager->persist($task);
         $manager->flush();
@@ -289,7 +289,7 @@ class TaskControllerTest extends WebTestCase
     {
         // User logged in
         $userRepository = $this->client->getContainer()->get('doctrine.orm.entity_manager')->getRepository(User::class);
-        $otherUser = $userRepository->findOneByUsername("alexandria56");
+        $otherUser = $userRepository->findOneByUsername("pauline");
         $this->client->loginUser($otherUser);
 
         $currentUser = $this->getUserTest();
@@ -401,7 +401,7 @@ class TaskControllerTest extends WebTestCase
     {
         // User logged in
         $userRepository = $this->client->getContainer()->get('doctrine.orm.entity_manager')->getRepository(User::class);
-        $otherUser = $userRepository->findOneByUsername("alexandria56");
+        $otherUser = $userRepository->findOneByUsername("pauline");
         $this->client->loginUser($otherUser);
 
         $currentUser = $this->getUserTest();
@@ -455,7 +455,6 @@ class TaskControllerTest extends WebTestCase
     public function testDeleteTaskUserNotLoggedIn(): void
     {
         $currentUser = $this->getUserTest();
-
         $taskRepository = $this->client->getContainer()->get('doctrine.orm.entity_manager')->getRepository(Task::class);
         $task = $taskRepository->findOneBy(['user' => $currentUser]);
 

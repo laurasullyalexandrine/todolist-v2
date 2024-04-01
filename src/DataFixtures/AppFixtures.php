@@ -22,6 +22,10 @@ class AppFixtures extends Fixture
     {
         $faker = Factory::create('fr_FR');
 
+        // tasks lasting more than a month
+        $now = new \DateTimeImmutable();
+        $oneMonthAgo = $now->sub(new \DateInterval('P1M'));
+
         // Administrator
         $admin = new User();
         $admin->setUsername('laura')
@@ -35,8 +39,19 @@ class AppFixtures extends Fixture
             )
             ->setCreatedAt(new \DateTimeImmutable());
 
+        // current task one month ago
+        $taskAdminOneMonthAgo = new Task();
+        $taskAdminOneMonthAgo->setTitle('Tâche administration n° 1')
+            ->setContent('Contenu de la tâche d\'administration n° 1')
+            ->setIsDone(false)
+            ->setCreatedAt($oneMonthAgo);
+
+        $admin->addTask($taskAdminOneMonthAgo);
+
+        $manager->persist($taskAdminOneMonthAgo);
+
         // current tasks
-        for ($t = 1; $t <= 5; $t++) {
+        for ($t = 2; $t <= 5; $t++) {
             $taskAdmin = new Task();
             $taskAdmin->setTitle('Tâche administration n° ' . $t)
                 ->setContent('Contenu de la tâche d\'administration n° ' . $t)
@@ -67,7 +82,7 @@ class AppFixtures extends Fixture
         $anonymous = new User();
         $anonymous->setUsername('anonymous')
             ->setEmail('anonymous@todolist.fr')
-            ->setRoles(['ROLE_ANONYMUS'])
+            ->setRoles(['ROLE_ANONYMOUS'])
             ->setPassword(
                 $this->hasher->hashPassword(
                     $anonymous,
@@ -76,8 +91,20 @@ class AppFixtures extends Fixture
             )
             ->setCreatedAt(new \DateTimeImmutable());
 
+
+        // current task one month ago
+        $taskAdminOneMonthAgo = new Task();
+        $taskAdminOneMonthAgo->setTitle('Tâche anonyme n° 1')
+            ->setContent('Contenu de la tâche anonyme n° 1')
+            ->setIsDone(false)
+            ->setCreatedAt($oneMonthAgo);
+
+        $anonymous->addTask($taskAdminOneMonthAgo);
+
+        $manager->persist($taskAdminOneMonthAgo);
+
         // current tasks
-        for ($t = 1; $t <= 8; $t++) {
+        for ($t = 2; $t <= 8; $t++) {
             $taskAnonymous = new Task();
             $taskAnonymous->setTitle('Tâche anonyme n° ' . $t)
                 ->setContent('Contenu de la tâche anonyme n° ' . $t)
@@ -105,8 +132,77 @@ class AppFixtures extends Fixture
         $manager->persist($anonymous);
 
 
+        // User Paul
+        $paul = new User();
+        $paul->setUsername('paul')
+            ->setEmail('paul@todolist.fr')
+            ->setRoles(['ROLE_USER'])
+            ->setPassword(
+                $this->hasher->hashPassword(
+                    $paul,
+                    "password"
+                )
+            )
+            ->setCreatedAt(new \DateTimeImmutable());
+
+        // current tasks one month ago
+        for ($t = 1; $t <= 2; $t++) {
+            $taskPaul = new Task();
+            $taskPaul->setTitle('Tâche à faire n° ' . $t)
+                ->setContent('Contenu de la tâche à faire n° ' . $t)
+                ->setIsDone(false)
+                ->setCreatedAt($oneMonthAgo);
+
+            $paul->addTask($taskPaul);
+
+            $manager->persist($taskPaul);
+        }
+
+        $manager->persist($paul);
+
+        // User Pauline
+        $pauline = new User();
+        $pauline->setUsername('pauline')
+            ->setEmail('pauline@todolist.fr')
+            ->setRoles(['ROLE_USER'])
+            ->setPassword(
+                $this->hasher->hashPassword(
+                    $pauline,
+                    "password"
+                )
+            )
+            ->setCreatedAt(new \DateTimeImmutable());
+
+        // current tasks
+        for ($t = 1; $t <= 8; $t++) {
+            $taskPauline = new Task();
+            $taskPauline->setTitle('Tâche à faire n° ' . $t)
+                ->setContent('Contenu de la tâche à faire n° ' . $t)
+                ->setIsDone(false)
+                ->setCreatedAt(new \DateTimeImmutable());
+
+            $pauline->addTask($taskPauline);
+
+            $manager->persist($taskPauline);
+        }
+
+        // tasks is done
+        for ($t = 1; $t <= 6; $t++) {
+            $taskPauline = new Task();
+            $taskPauline->setTitle('Tâche terminée n° ' . $t)
+                ->setContent('Contenu de la tâche terminée n° ' . $t)
+                ->setIsDone(true)
+                ->setCreatedAt(new \DateTimeImmutable());
+
+            $pauline->addTask($taskPauline);
+
+            $manager->persist($taskPauline);
+        }
+
+        $manager->persist($pauline);
+
         // Users
-        for ($u = 1; $u <= 20; $u++) {
+        for ($u = 1; $u <= 18; $u++) {
             $user = new User();
             $user->setUsername($faker->userName())
                 ->setEmail($user->getUsername() . '@todolist.fr')

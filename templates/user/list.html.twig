@@ -3,9 +3,9 @@
 {% block header_img %}{% endblock %}
 
 {% block body %}
-		{% if app.user and is_granted ("ROLE_ADMIN") %}
-			<a href="{{ path('admin_users_register') }}" class="btn btn-warning pull-right">Créer un utilisateur</a>
-		{% endif %}
+	{% if app.user and is_granted ("ROLE_ADMIN") %}
+		<a href="{{ path('admin_users_register') }}" class="btn btn-warning pull-right">Créer un utilisateur</a>
+	{% endif %}
 	{% if users|length == 0 %}
 		<div class="alert alert-warning">
 			Il n'y a pas encore d'utilisateur enregistré.

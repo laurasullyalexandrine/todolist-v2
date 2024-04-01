@@ -38,7 +38,7 @@ class UserControllerTest extends WebTestCase
     public function testAccessDenyReadUsers(): void
     {
         $userRepository = $this->client->getContainer()->get('doctrine.orm.entity_manager')->getRepository(User::class);
-        $currentUser = $userRepository->findOneByUsername("ppayet");
+        $currentUser = $userRepository->findOneByUsername("pauline");
 
         $currentUser->setRoles(['ROLE_USER']);
 
@@ -106,7 +106,7 @@ class UserControllerTest extends WebTestCase
 
         $userRepository = $this->client->getContainer()->get('doctrine.orm.entity_manager')->getRepository(User::class);
 
-        $user = $userRepository->findOneByUsername(['user' => 'diane42']);
+        $user = $userRepository->findOneByUsername(['user' => 'paul']);
 
         $urlGenerator = $this->client->getContainer()->get('router');
         $this->client->request(Request::METHOD_POST, $urlGenerator->generate('admin_users_edit', ['id' => $user->getId()]));
@@ -114,8 +114,8 @@ class UserControllerTest extends WebTestCase
         $this->assertResponseIsSuccessful();
 
         $this->client->submitForm('Modifier', [
-            'user[username]' => 'diane42',
-            'user[email]' => 'diane42@todolist.fr',
+            'user[username]' => 'paul',
+            'user[email]' => 'paul@todolist.fr',
             'user[password][first]' => 'password_2',
             'user[password][second]' => 'password_2',
         ]);
@@ -144,7 +144,7 @@ class UserControllerTest extends WebTestCase
 
         $userRepository = $this->client->getContainer()->get('doctrine.orm.entity_manager')->getRepository(User::class);
 
-        $user = $userRepository->findOneByUsername(['user' => 'diane42']);
+        $user = $userRepository->findOneByUsername(['user' => 'paul']);
 
         $urlGenerator = $this->client->getContainer()->get('router');
 
@@ -153,8 +153,8 @@ class UserControllerTest extends WebTestCase
 
         $formData = [
             'user[roles][1]' => 'ROLE_ADMIN',
-            'user[username]' => 'diane42',
-            'user[email]' => 'diane42@todolist.fr',
+            'user[username]' => 'paul',
+            'user[email]' => 'paul@todolist.fr',
             'user[password][first]' => 'password_2djr-i_(-nfg',
             'user[password][second]' => 'password_2djr-i_(-nfg',
         ];
@@ -175,7 +175,7 @@ class UserControllerTest extends WebTestCase
 
         $this->client->followRedirect();
 
-        $updatedUser = $userRepository->findOneByUsername('diane42');
+        $updatedUser = $userRepository->findOneByUsername('paul');
 
         $this->assertTrue(in_array('ROLE_ADMIN', $updatedUser->getRoles()));
 
