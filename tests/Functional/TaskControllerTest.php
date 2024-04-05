@@ -106,19 +106,8 @@ class TaskControllerTest extends WebTestCase
         $currentUser = $userRepository->findOneByUsername("laura");
         $this->client->loginUser($currentUser);
 
-        $manager = $this->client->getContainer()->get('doctrine.orm.entity_manager');
-
-        $now = new \DateTimeImmutable();
-        $oneMonthAgo = $now->sub(new \DateInterval('P1M'));
-
-        $task = new Task();
-        $task->setTitle('Tâche administration n° 1');
-        $task->setContent('Contenu de la tâche d\'administration n° 1');
-        $task->setIsDone(false);
-        $task->setCreatedAt($oneMonthAgo);
-
-        $manager->persist($task);
-        $manager->flush();
+        $taskRepository = $this->client->getContainer()->get('doctrine.orm.entity_manager')->getRepository(Task::class);
+        $task = $taskRepository->findOneBy(['user' => $currentUser]);
 
         $urlGenerator = $this->client->getContainer()->get('router.default');
         $this->client->request(Request::METHOD_GET, $urlGenerator->generate('task_list'));
@@ -143,19 +132,8 @@ class TaskControllerTest extends WebTestCase
         $currentUser = $userRepository->findOneByUsername("anonymous");
         $this->client->loginUser($currentUser);
 
-        $manager = $this->client->getContainer()->get('doctrine.orm.entity_manager');
-
-        $now = new \DateTimeImmutable();
-        $oneMonthAgo = $now->sub(new \DateInterval('P1M'));
-
-        $task = new Task();
-        $task->setTitle('Tâche anonyme n° 1');
-        $task->setContent('Contenu de la tâche anonyme n° 1');
-        $task->setIsDone(false);
-        $task->setCreatedAt($oneMonthAgo);
-
-        $manager->persist($task);
-        $manager->flush();
+        $taskRepository = $this->client->getContainer()->get('doctrine.orm.entity_manager')->getRepository(Task::class);
+        $task = $taskRepository->findOneBy(['user' => $currentUser]);
 
         $urlGenerator = $this->client->getContainer()->get('router.default');
         $this->client->request(Request::METHOD_GET, $urlGenerator->generate('task_list'));

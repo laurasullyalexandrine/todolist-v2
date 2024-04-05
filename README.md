@@ -17,7 +17,7 @@ Le projet intègre des fonctionnalités de sécurité robustes pour garantir la 
 - Symfony CLI 5.6
 - Symfony 6.4.2
 
-## INSTALLATION
+## INSTALLATION DE LA BASE DE DONNEES
 
 1. Clôner le projet depuis mon compte gitHub sur votre disque dur.
 2. Ouvrez le projet dans votre éditeur de texte.
@@ -29,6 +29,12 @@ Le projet intègre des fonctionnalités de sécurité robustes pour garantir la 
 7. Créer la base de données : `symfony console doctrine:database:create`
 8. Jouer la dernière migration : `symfony console doctrine:migrations:migrate`
 9. Charger les fixtures : `symfony console doctrine:fixtures:load`
+
+## INSTALLATION  DE LA BASE DE DONNEES DE TEST
+
+1. Créer la base de données de test : `symfony console --env=test doctrine:database:create`
+2. Jouer la dernière migration de test : `symfony console --env=test doctrine:migrations:migrate`
+3. Charger les fixtures de test : `symfony console --env=test doctrine:fixtures:load`
 
 ## DOCUMENTATION À UTILISER
 
