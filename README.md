@@ -45,3 +45,5 @@ Le projet intègre des fonctionnalités de sécurité robustes pour garantir la 
 [Documentation Doctrine](https://www.doctrine-project.org/projects/doctrine-orm/en/2.16/index.html)
 
 [Documentation Twig](https://twig.symfony.com/doc/)
+
+[Documentation tester avec PHPUnit](https://symfony.com/doc/current/testing.html#the-crawler)
