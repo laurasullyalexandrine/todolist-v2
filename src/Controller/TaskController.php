@@ -29,49 +29,42 @@ class TaskController extends AbstractController
     #[Route('/', name: 'list', methods: ['GET'])]
     public function list(): Response
     {
-        if (!$this->getUser()) {
+        if (!$user = $this->getUser()) {
             $this->addFlash('danger', 'Merci de vous connecter!');
             return $this->redirectToRoute('login');
         }
 
-        $tasks = $this->taskRepository->findByIsDoneFalse($this->getUser());
-
         $now = new \DateTimeImmutable();
 
-        foreach ($tasks as $task) {
-            $createdAt = $task->getCreatedAt();
-            $difference = $now->diff($createdAt);
-            $monthsDifference = $difference->format('%m');
+        $tasks = $this->taskRepository->findByIsDoneFalse($user);
 
-            if ($monthsDifference >= 1) {
-                $taskTitle = $task->getTitle();
-                $this->addFlash('danger', 'La tâche ' . $taskTitle . ' créée le ' . $createdAt->format('d-m-Y') . ' a plus d\'un mois! Merci de l\'a traitée ou de la supprimer.');
-            }
-        }
-
+        // Fetch tasks for anonymous user if logged-in user is admin
         $tasksAnonymous = [];
-        // Task processing only by admin role
-        if (isset($this->getUser()->getRoles()[0]) && $this->getUser()->getRoles()[0] === "ROLE_ADMIN") {
+        if ($user->getRoles()[0] === "ROLE_ADMIN") {
             $anonymous = $this->userRepository->findOneByUsername("anonymous");
             $tasksAnonymous = $this->taskRepository->findByIsDoneFalse($anonymous);
-
-            foreach ($tasksAnonymous as $taskAnonymous) {
-                $createdAt = $taskAnonymous->getCreatedAt();
-
-                $difference = $now->diff($createdAt);
-                $monthsDifference = $difference->format('%m');
-
-                if ($monthsDifference >= 1) {
-                    $taskTitle = $taskAnonymous->getTitle();
-                    $this->addFlash('danger', 'La tâche ' . $taskTitle . ' créée le ' . $createdAt->format('d-m-Y') . ' a plus d\'un mois! Merci de l\'a traitée ou de la supprimer.');
-                }
-            }
         }
+
+        // Check if tasks are older than one month and add flash messages
+        $this->addFlashForOldTasks($tasks, $now);
+        $this->addFlashForOldTasks($tasksAnonymous, $now);
 
         return $this->render('task/list.html.twig', [
             'tasks' => $tasks,
             'tasksAnonymous' => $tasksAnonymous,
         ]);
+    }
+
+    // Function to add flash messages for tasks older than one month
+    private function addFlashForOldTasks(array $tasks, \DateTimeImmutable $now): void
+    {
+        foreach ($tasks as $task) {
+            $createdAt = $task->getCreatedAt();
+            $monthsDifference = $now->diff($createdAt)->format('%m');
+            if ($monthsDifference >= 1) {
+                $this->addFlash('danger', 'La tâche ' . $task->getTitle() . ' créée le ' . $createdAt->format('d-m-Y') . ' a plus d\'un mois! Merci de l\'a traitée ou de la supprimer.');
+            }
+        }
     }
 
 
