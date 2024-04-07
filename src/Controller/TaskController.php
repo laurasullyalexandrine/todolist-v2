@@ -3,7 +3,6 @@
 namespace App\Controller;
 
 use App\Entity\Task;
-use App\Entity\User;
 use App\Form\TaskType;
 use App\Security\Voter\TaskVoter;
 use App\Repository\TaskRepository;
@@ -12,10 +11,13 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;;
+
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 #[Route('/tasks', name: 'task_')]
+#[IsGranted('ROLE_USER')]
 class TaskController extends AbstractController
 {
     public function __construct(
@@ -26,14 +28,33 @@ class TaskController extends AbstractController
     ) {
     }
 
+
+    #[Route('/create', name: 'create', methods: ["GET", "POST"])]
+    public function create(Request $request): Response
+    {
+        $task = new Task();
+
+        $form = $this->createForm(TaskType::class, $task);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $task->setUser($this->getUser());
+            $this->manager->persist($task);
+            $this->manager->flush();
+
+            $this->addFlash('success', 'Votre tâche a bien été ajoutée.');
+            return $this->redirectToRoute('task_list');
+        }
+
+        return $this->render('task/create.html.twig', [
+            'form' => $form->createView(),
+        ]);
+    }
+
     #[Route('/', name: 'list', methods: ['GET'])]
     public function list(): Response
     {
-        if (!$user = $this->getUser()) {
-            $this->addFlash('danger', 'Merci de vous connecter!');
-            return $this->redirectToRoute('login');
-        }
-
+        $user = $this->getUser();
         $now = new \DateTimeImmutable();
 
         $tasks = $this->taskRepository->findByIsDoneFalse($user);
@@ -71,11 +92,6 @@ class TaskController extends AbstractController
     #[Route('/list-is-done', name: 'list_is_done', methods: ['GET'])]
     public function listIsDone(): Response
     {
-        if (!$this->getUser()) {
-            $this->addFlash('danger', 'Merci de vous connecter!');
-            return $this->redirectToRoute('login');
-        }
-
         $tasks = $this->taskRepository->findByIsDoneTrue($this->getUser());
         $anonymous = $this->userRepository->findOneByUsername("anonymous");
 
@@ -87,41 +103,10 @@ class TaskController extends AbstractController
         ]);
     }
 
-    #[Route('/create', name: 'create', methods: ["GET", "POST"])]
-    public function create(Request $request): Response
-    {
-        if (!$this->getUser()) {
-            $this->addFlash('danger', 'Merci de vous connecter!');
-            return $this->redirectToRoute('login');
-        }
-
-        $task = new Task();
-
-        $form = $this->createForm(TaskType::class, $task);
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $task->setUser($this->getUser());
-            $this->manager->persist($task);
-            $this->manager->flush();
-
-            $this->addFlash('success', 'Votre tâche a bien été ajoutée.');
-            return $this->redirectToRoute('task_list');
-        }
-
-        return $this->render('task/create.html.twig', [
-            'form' => $form->createView(),
-        ]);
-    }
 
     #[Route('/{id}/edit', name: 'edit', methods: ["GET", "POST"])]
     public function edit(Task $task, Request $request): Response
     {
-        if (!$this->getUser()) {
-            $this->addFlash('danger', 'Merci de vous connecter!');
-            return $this->redirectToRoute('login');
-        }
-
         $this->denyAccessUnlessGranted(TaskVoter::EDIT, $task);
 
         $form = $this->createForm(TaskType::class, $task);
@@ -171,16 +156,8 @@ class TaskController extends AbstractController
         Task $task
     ): mixed {
 
-        $user = $this->getUser();
-        if (!$user instanceof User) {
-
-            $this->addFlash('danger', 'Merci de vous connecter!');
-            return $this->redirectToRoute('login');
-        }
-
-
         $this->denyAccessUnlessGranted(TaskVoter::DELETE, $task);
-        $user->removeTask($task);
+        $this->manager->remove($task);
 
         $this->manager->flush();
 
