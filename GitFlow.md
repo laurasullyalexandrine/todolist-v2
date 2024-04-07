@@ -17,7 +17,7 @@ Suivre les instructions présentes dans le fichier README.
 
 ## CREATION D'UNE FEATURE BRANCH
 
-Avant de commencer à travailler sur une nouvelle fonctionnalité, créez une nouvelle branche de fonctionnalité à partir de la branche develop en utilisant la convention de nommage suivante : ``git checkout -b feature/nom_de_la_fonctionnalite develop``
+Avant de commencer à travailler sur une nouvelle fonctionnalité, créez une nouvelle branche de fonctionnalité à partir de la branche ``develop`` en utilisant la convention de nommage suivante : ``git checkout -b feature/nom_de_la_fonctionnalite develop``
 
 ## TRAVAIL SUR LA FONCTIONNALITE
 
@@ -25,7 +25,7 @@ Développez la nouvelle fonctionnalité en respectant les bonnes pratiques de co
 
 ## COMMIT ET PUSH DES MODIFICATIONS
 
-Une fois que vous avez terminé de travailler sur la fonctionnalité, effectuez les commits de vos modifications localement et poussez-les vers votre repository :
+Une fois que vous avez terminé de travailler sur la fonctionnalité, effectuez les commits de vos modifications sur la branche feature :
 
 ``git add``
 
