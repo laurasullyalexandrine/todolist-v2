@@ -18,7 +18,7 @@ ToDoList-> Admin: échec de l'inscription
 
 Admin  -> ToDoList: demander authentification 
 ToDoList-> Admin: valider authentification 
-else 401 (Unauthorized) identification invalides
+else 401 (Unauthorized) identification invalide
 ToDoList-> Admin: échec de l'authentification
 
 Admin  -> User: ajouter utilisateur
@@ -29,14 +29,14 @@ User -> Admin: l'utilisateur n'a pas pu être ajouté
 Admin  -> User: éditer utilisateur
 User -> Admin: valider édition
 else 404 (Page not found)
-User -> Admin: l'utilisateur en cours de modification n'existe pas
+User -> Admin: l'utilisateur demandée n'existe pas
 
 Admin  -> User: supprimer utilisateur
 User -> Admin: valider suppression
 else 403 (Forbidden)
 User -> Admin: Vous n'avez pas accès à cette ressource
 
-Admin  -> Task: ajouter tâche
+Admin  -> Task: ajouter une tâche
 Task -> Admin: valider ajout
 else erreur durant le traitement
 Task -> Admin: la tâche n'a pas pu être ajoutée

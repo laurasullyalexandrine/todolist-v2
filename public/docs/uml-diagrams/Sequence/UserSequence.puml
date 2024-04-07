@@ -1,17 +1,18 @@
-@startuml AdminSequence
+@startuml UserSequence
 
 skinparam responseMessageBelowArrow true
 skinparam SequenceMessageAlignment center
 
-actor User as User #YellowGreen
+actor User as User #OliveDrab
 
 entity Task as Task #GreenYellow
 
 database ToDoList as ToDoList #Orange
 
-User  -> ToDoList: demander authentification 
+User  -> ToDoList: demander authentification
+alt cas réussi
 ToDoList-> User: valider authentification 
-else 401 (Unauthorized) identification invalides
+else 401 (Unauthorized) identification invalide
 ToDoList-> User: échec de l'authentification
 
 User  -> Task: ajouter une tâche
@@ -29,6 +30,8 @@ Task -> User: valider suppression
 else 403 (Forbidden)
 Task -> User: Vous n'avez pas accès à cette ressource
 
+User  -> Task: supprimer tâche anonyme
+Task -> User: valider suppression
 
 end
 @enduml
