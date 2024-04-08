@@ -63,4 +63,6 @@ Une fois que la branche de ``release`` est considérée comme prête, elle est f
 
 Cela marque la fin du cycle de développement pour cette version et met à jour la branche ``main`` avec les dernières fonctionnalités stables.
 
-Une branche ``hotfix`` peut être créée à partir de la branche ``main`` afin de corriger des bogues minimes détectés sur la production.
+Une branche ``hotfix`` est une branche de maintenance qui peut être créée à partir de la branche ``main`` afin de corriger des bogues minimes détectés sur la production.
+
+Une fois la branche ``hotfix``  terminée, elle est mergée dans ``develop`` et dans ``main``.
