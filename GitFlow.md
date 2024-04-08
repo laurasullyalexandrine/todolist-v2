@@ -1,8 +1,13 @@
 # Guide de Contribution *GitFlow pour l'Application ToDoList
 
+![schema du modèle GitFlow](/public/img/git-flow-diagram.jpg)
+
 ## INTRODUCTION
 
 Ce guide vous fournira des instructions détaillées sur la manière de contribuer efficacement au projet ToDolist, en utilisant le modèle de développement GitFlow.
+GitFlow est un modèle de développement qui utilise Git comme système de contrôle de version.
+Le modèle GitFlow repose sur deux branches principales : ``main`` et ``develop``.
+La branche ``develop`` est utilisée pour intégrer les différentes fonctionnalités développées par l'équipe.
 
 ## PRÉREQUIS
 
@@ -25,9 +30,9 @@ Développez la nouvelle fonctionnalité en respectant les bonnes pratiques de co
 
 ## COMMIT ET PUSH DES MODIFICATIONS
 
-Une fois que vous avez terminé de travailler sur la fonctionnalité, effectuez les commits de vos modifications sur la branche feature :
+Une fois que vous avez terminé de travailler sur la fonctionnalité, effectuez les commits de vos modifications sur votre branche feature :
 
-``git add``
+``git add .``
 
 ``git commit -m "Description concise des modifications"``
 
@@ -39,7 +44,7 @@ Avant de soumettre votre travail, assurez-vous que toutes les nouvelles fonction
 
 ## SOUMISSION DE LA DEMANDE DE TIRAGE (Pull Request)
 
-Une fois le développement terminé et les tests réussis, sur GitHub ouvrez une demande de tirage (pull request) vers la branche ``develop``. Décrivez clairement les changements apportés et mentionnez la tâche associée. Les demandes de tirage doivent être examinées par un pair avant d'être fusionnées.
+Une fois le développement terminé et les tests réussis, sur GitHub ouvrez une demande de tirage (pull request) vers la branche ``develop``. Décrivez clairement les changements apportés et mentionnez la tâche associée. Les demandes de tirage doivent être examinées par un développeur senior avant d'être fusionnées.
 
 ## INTEGRATION
 
@@ -47,6 +52,15 @@ Une fois que la demande de tirage a été approuvée et que tous les problèmes 
 
 ## INFORMATIONS COMPLEMENTAIRES IMPORTANTES
 
-Seulement et seulement si une série de fonctionnalités est prête à être publiée en tant que nouvelle version, une branche de ``release`` est créée à partir de la branche ``develop``.
-Les tests de validation sont effectués sur la branche de ``release`` pour s'assurer que toutes les fonctionnalités incluses fonctionnent correctement et qu'aucun bogue critique n'est présent.
-Une fois que la branche de ``release`` est considérée comme prête, elle est fusionnée dans la branche ``main``. Cela marque la fin du cycle de développement pour cette version et met à jour la branche ``main`` avec les dernières fonctionnalités stables.
+Seulement et seulement si une série de fonctionnalités est prête à être publiée en tant que nouvelle version, une branche de ``release`` en utilisant la convention de nommage ``git checkout -b release/0.1.0`` est créée à partir de la branche ``develop``.
+Les tests de validation sont effectués sur cette branche de ``release`` pour s'assurer que toutes les fonctionnalités incluses fonctionnent correctement et qu'aucun bogue critique n'est présent.
+
+Une fois que la branche de ``release`` est considérée comme prête, elle est fusionnée dans la branche ``main``
+
+``git checkout main``
+
+``git merge release/0.1.0``
+
+Cela marque la fin du cycle de développement pour cette version et met à jour la branche ``main`` avec les dernières fonctionnalités stables.
+
+Une branche ``hotfix`` peut être créée à partir de la branche ``main`` afin de corriger des bogues minimes détectés sur la production.
