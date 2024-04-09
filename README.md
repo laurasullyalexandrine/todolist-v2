@@ -35,6 +35,8 @@ Le projet intègre des fonctionnalités de sécurité robustes pour garantir la 
 1. Créer la base de données de test : `symfony console --env=test doctrine:database:create`
 2. Jouer la dernière migration de test : `symfony console --env=test doctrine:migrations:migrate`
 3. Charger les fixtures de test : `symfony console --env=test doctrine:fixtures:load`
+4. Lancer les tests : `vendor/bin/phpunit`
+5. Mettre à jour le rapport de couverture de code : `vendor/bin/phpunit --coverage-html public/test-coverage`
 
 ## DOCUMENTATION À UTILISER
 
