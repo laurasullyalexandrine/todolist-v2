@@ -204,8 +204,8 @@ class AppFixtures extends Fixture
         // Users
         for ($u = 1; $u <= 18; $u++) {
             $user = new User();
-            $user->setUsername($faker->userName())
-                ->setEmail($user->getUsername() . '@todolist.fr')
+            $user->setUsername($faker->firstName().$u)
+                ->setEmail(strtolower($user->getUsername()) . '@todolist.fr')
                 ->setRoles(['ROLE_USER'])
                 ->setCreatedAt(new \DateTimeImmutable())
                 ->setPassword(
@@ -233,7 +233,7 @@ class AppFixtures extends Fixture
                 $task = new Task();
                 $task->setTitle('Tâche terminée n° ' . $t . ' de ' . $user->getUsername())
                     ->setContent('Contenu de la tâche terminée n° ' . $t . ' de ' . $user->getUsername())
-                    ->setIsDone(false)
+                    ->setIsDone(true)
                     ->setCreatedAt(new \DateTimeImmutable());
 
                 $user->addTask($task);
